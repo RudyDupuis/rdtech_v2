@@ -4,13 +4,35 @@ import SkillComp from '@/components/content/SkillComp.vue'
 import { GetSkill } from '@/entities/Skill'
 import { ApiMethods } from '@/helpers/ApiMethods'
 import useIsSmallScreen from '@/helpers/useIsSmallScreen'
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const isSmallScreen = useIsSmallScreen()
 
 const api = new ApiMethods()
-const skills = ref<Array<GetSkill>>([])
-api.getData('skills').then((returnedValue) => (skills.value = returnedValue))
+const softSkills = ref<Array<GetSkill>>([])
+const hardSkills = ref<Array<GetSkill>>([])
+const skillsFilter = ref<GetSkill['mastery'] | null>(null)
+const filteredHardSkills = computed<Array<GetSkill>>(() => {
+  if (skillsFilter.value === null) {
+    return hardSkills.value
+  }
+  return hardSkills.value.filter((skill) => skill.mastery === skillsFilter.value)
+})
+
+function toggleFilter(filter: GetSkill['mastery']) {
+  skillsFilter.value = skillsFilter.value === filter ? null : filter
+}
+
+onMounted(() => {
+  api.getData('skills').then((returnedValue) =>
+    returnedValue
+      .sort((a: GetSkill, b: GetSkill) => a.name.localeCompare(b.name))
+      .forEach((value: GetSkill) => {
+        value.type === 'softSkill' && softSkills.value.push(value)
+        value.type === 'hardSkill' && hardSkills.value.push(value)
+      })
+  )
+})
 </script>
 
 <template>
@@ -60,12 +82,54 @@ api.getData('skills').then((returnedValue) => (skills.value = returnedValue))
       </div>
     </section>
 
-    <section id="skills">
-      <h2>Mes compétences</h2>
+    <section id="skills" class="f-col a-cent bg-grey-3 ptb3">
+      <h2 class="mb3">Mes compétences</h2>
+      <div class="prl2">
+        <h3 class="mb2">Hard skills</h3>
+        <div class="button-list f a-cent j-betw mb2">
+          <button
+            class="choice-button"
+            :class="{ 'choice-button--active': skillsFilter === 'advanced' }"
+            @click="toggleFilter('advanced')"
+          >
+            Avancé
+          </button>
+          <button
+            class="choice-button ml1"
+            :class="{ 'choice-button--active': skillsFilter === 'intermediate' }"
+            @click="toggleFilter('intermediate')"
+          >
+            Intermédiaire
+          </button>
+          <button
+            class="choice-button ml1"
+            :class="{ 'choice-button--active': skillsFilter === 'beginner' }"
+            @click="toggleFilter('beginner')"
+          >
+            Débutant
+          </button>
+        </div>
 
-      <h3>Hard skills</h3>
-      <skill-comp v-for="(skill, index) in skills" :key="index" :skill="skill" />
-      <h3>Soft skills</h3>
+        <div class="skill-list mb3">
+          <skill-comp
+            v-for="(skill, index) in filteredHardSkills"
+            :key="index"
+            :skill="skill"
+            :color="skill.mastery === 'advanced' ? 'primary' : 'secondary'"
+            size="medium"
+          />
+        </div>
+        <h3 class="mb3">Soft skills</h3>
+        <div class="skill-list">
+          <skill-comp
+            v-for="(skill, index) in softSkills"
+            :key="index"
+            :skill="skill"
+            color="secondary"
+            size="medium"
+          />
+        </div>
+      </div>
     </section>
   </main>
 </template>
@@ -101,6 +165,48 @@ api.getData('skills').then((returnedValue) => (skills.value = returnedValue))
 
     p {
       width: 80vw;
+    }
+  }
+}
+
+#skills {
+  h3 {
+    text-align: left;
+  }
+
+  .skill-list {
+    display: grid;
+    gap: 32px;
+    grid-template-columns: repeat(7, 1fr);
+    justify-items: center;
+
+    @media (max-width: 1000px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @media (max-width: 800px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 400px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .button-list {
+    @media (max-width: 800px) {
+      flex-direction: column;
+      button {
+        margin-left: 0;
+        margin-bottom: 16px;
+        width: 300px;
+      }
+    }
+    @media (max-width: 400px) {
+      button {
+        width: 80vw;
+      }
     }
   }
 }

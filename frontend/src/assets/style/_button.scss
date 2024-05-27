@@ -29,3 +29,25 @@ button {
     color: $light;
   }
 }
+
+/** to use with <button> **/
+.choice-button {
+  padding: 10px 0;
+  width: 230px;
+  background: $grey-1;
+  text-transform: none;
+  font-family: $font-regular;
+
+  &:hover {
+    background: $grey-2;
+    color: $light;
+  }
+
+  &--active {
+    background: $primary;
+
+    &:hover {
+      background: $light-primary;
+    }
+  }
+}

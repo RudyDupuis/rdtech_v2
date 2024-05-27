@@ -1,5 +1,6 @@
 $primary: #1282a2;
 $dark-primary: #12728d;
+$light-primary: #97ccdb;
 
 $secondary: #be8242;
 
@@ -19,4 +20,8 @@ $grey-3: #e0e0e0;
   p {
     color: $light;
   }
+}
+
+.bg-grey-3 {
+  background: $grey-3;
 }

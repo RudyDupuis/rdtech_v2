@@ -1,18 +1,39 @@
 <script setup lang="ts">
 import type { GetSkill } from '@/entities/Skill'
+import { onMounted, ref, watch } from 'vue'
 
 interface Props {
   skill: GetSkill
+  size: 'medium' | 'small'
+  color: 'primary' | 'secondary' | 'grey'
 }
 
-const url = import.meta.env.VITE_BACKEND_URL
+const props = defineProps<Props>()
+const svgContent = ref()
 
-defineProps<Props>()
+function fetchSvg() {
+  fetch(import.meta.env.VITE_BACKEND_URL + props.skill.svg_path)
+    .then((response) => response.text())
+    .then((text) => (svgContent.value = text))
+}
+
+watch(
+  () => props.skill,
+  () => {
+    fetchSvg()
+  }
+)
+
+onMounted(() => {
+  fetchSvg()
+})
 </script>
 
 <template>
   <div class="f-col a-cent">
-    <img :src="url + skill.svg_path" :alt="'Logo de ' + skill.name" />
-    <p>{{ skill.name }}</p>
+    <div v-html="svgContent" :class="`skill-size-${props.size} skill-color-${props.color}`"></div>
+    <p class="text-a-cent" :style="`font-size: ${size == 'small' ? 10 : 12}px;`">
+      {{ skill.name }}
+    </p>
   </div>
 </template>

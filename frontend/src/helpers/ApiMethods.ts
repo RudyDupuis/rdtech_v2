@@ -19,4 +19,11 @@ export class ApiMethods {
     })
     return response.json()
   }
+
+  async deleteData(endpoint: string) {
+    const url = `${this.baseUrl}${endpoint}`
+    await fetch(url, {
+      method: 'DELETE'
+    })
+  }
 }
