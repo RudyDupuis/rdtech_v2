@@ -11,39 +11,56 @@ interface Props {
 const props = defineProps<Props>()
 const api = new ApiMethods()
 
+const fileInput = ref<HTMLInputElement | null>(null)
+
 const selectedtype = ref<'softSkill' | 'hardSkill'>('hardSkill')
 const editingSkill = ref<PostSoftSkill | PostHardSkill | PutSoftSkill | PutHardSkill>(
   new PostHardSkill('', null, 'beginner')
 )
-const imageUrl = ref<string>('')
+const imageUrl = computed<string>(() => {
+  return isPutSkill(editingSkill.value)
+    ? import.meta.env.VITE_BACKEND_URL + editingSkill.value.svg_path
+    : ''
+})
 
-const isPostMode = computed(
-  () => editingSkill.value instanceof PostSoftSkill || editingSkill.value instanceof PostHardSkill
-)
 const skillType = computed<'hard-skills' | 'soft-skills' | undefined>(() => {
-  if (editingSkill.value instanceof PostSoftSkill || editingSkill.value instanceof PutSoftSkill) {
+  if (isSoftSkill(editingSkill.value)) {
     return 'soft-skills'
   }
-  if (editingSkill.value instanceof PostHardSkill || editingSkill.value instanceof PutHardSkill) {
+  if (isHardSkill(editingSkill.value)) {
     return 'hard-skills'
   }
   return undefined
 })
 
+function isPostSkill(skill: typeof editingSkill.value): skill is PostHardSkill | PostSoftSkill {
+  return skill instanceof PostHardSkill || skill instanceof PostSoftSkill
+}
+function isPutSkill(skill: typeof editingSkill.value): skill is PutHardSkill | PutSoftSkill {
+  return skill instanceof PutHardSkill || skill instanceof PutSoftSkill
+}
+function isHardSkill(skill: typeof editingSkill.value): skill is PostHardSkill | PutHardSkill {
+  return skill instanceof PostHardSkill || skill instanceof PutHardSkill
+}
+function isSoftSkill(skill: typeof editingSkill.value): skill is PostSoftSkill | PutSoftSkill {
+  return skill instanceof PostSoftSkill || skill instanceof PutSoftSkill
+}
+
 function resetForm() {
   editingSkill.value = new PostHardSkill('', null, 'beginner')
   selectedtype.value = 'hardSkill'
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
 }
 
 async function handleSubmit() {
   try {
     if (skillType.value) {
-      if (isPostMode.value) {
+      if (isPostSkill(editingSkill.value)) {
         await api.postData(skillType.value, editingSkill.value)
-      } else if (
-        editingSkill.value instanceof PutHardSkill ||
-        editingSkill.value instanceof PutSoftSkill
-      ) {
+      }
+      if (isPutSkill(editingSkill.value)) {
         await api.putData(skillType.value + '/' + editingSkill.value.id, editingSkill.value)
       }
       resetForm()
@@ -63,7 +80,7 @@ function handleFileUpload(event: Event) {
 
 async function handleDelete() {
   try {
-    if (editingSkill.value instanceof PutHardSkill || editingSkill.value instanceof PutSoftSkill) {
+    if (isPutSkill(editingSkill.value)) {
       await api.deleteData(skillType.value + '/' + editingSkill.value.id)
       resetForm()
       props.getSkills()
@@ -85,9 +102,6 @@ watch(
     if (props.skill) {
       editingSkill.value = props.skill
     }
-    if (editingSkill.value instanceof PutSoftSkill || editingSkill.value instanceof PutHardSkill) {
-      imageUrl.value = import.meta.env.VITE_BACKEND_URL + editingSkill.value.svg_path
-    }
   }
 )
 </script>
@@ -95,21 +109,21 @@ watch(
 <template>
   <div class="f-col a-cent">
     <h3 class="mb2">
-      {{ (isPostMode ? 'Créer' : 'Modifier ') + ' une compétence' }}
+      {{ (isPostSkill(editingSkill) ? 'Créer' : 'Modifier ') + ' une compétence' }}
     </h3>
 
-    <select v-if="isPostMode" v-model="selectedtype" placeholder="Type">
+    <select v-if="isPostSkill(editingSkill)" v-model="selectedtype" placeholder="Type">
       <option value="softSkill">Soft Skill</option>
       <option value="hardSkill">Hard Skill</option>
     </select>
 
-    <img v-if="!isPostMode" :src="imageUrl" alt="'Logo de ' + editingSkill.name" />
+    <img v-if="isPutSkill(editingSkill)" :src="imageUrl" :alt="'Logo de ' + editingSkill.name" />
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mb1">
       <input v-model="editingSkill.name" type="text" placeholder="Nom" required />
 
       <select
-        v-if="editingSkill instanceof PostHardSkill || editingSkill instanceof PutHardSkill"
+        v-if="isHardSkill(editingSkill)"
         v-model="editingSkill.mastery"
         placeholder="Maîtrise"
         required
@@ -119,26 +133,50 @@ watch(
         <option value="beginner">Débutant</option>
       </select>
 
-      <label for="svg_path">SVG | 80px par 80px | Ex nommage: 'Vue-js.svg'</label>
+      <label for="svg" class="text-a-cent">SVG - 80px par 80px</label>
       <input
+        ref="fileInput"
         type="file"
-        id="svg_path"
+        id="svg"
         accept=".svg"
         @change="handleFileUpload"
-        :required="isPostMode"
+        :required="isPostSkill(editingSkill)"
       />
 
-      <div class="f a-cent">
-        <button v-if="!isPostMode" type="button" class="bg-secondary" @click="resetForm()">
+      <div class="list-button f a-cent">
+        <button
+          v-if="isPutSkill(editingSkill)"
+          type="button"
+          class="bg-grey-1"
+          @click="resetForm()"
+        >
           Annuler
         </button>
-        <button type="submit" :class="{ ml2: !isPostMode }">
-          {{ isPostMode ? 'Créer' : 'Modifier ' }}
+        <button type="submit" :class="{ ml2: isPutSkill(editingSkill) }">
+          {{ isPostSkill(editingSkill) ? 'Créer' : 'Modifier ' }}
         </button>
       </div>
     </form>
-    <button v-if="!isPostMode" type="button" class="bg-warning mb3" @dblclick="handleDelete()">
+    <button
+      v-if="isPutSkill(editingSkill)"
+      type="button"
+      class="bg-warning mb3"
+      @dblclick="handleDelete()"
+    >
       Double cliquer pour supprimer
     </button>
   </div>
 </template>
+
+<style scoped lang="scss">
+.list-button {
+  @media (max-width: 500px) {
+    flex-direction: column;
+
+    button {
+      margin-left: 0;
+      margin-top: 16px;
+    }
+  }
+}
+</style>

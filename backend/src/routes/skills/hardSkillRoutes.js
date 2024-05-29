@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const hardSkillController = require("../controllers/hardSkillController");
-const skillUpload = require("../middleswares/uploadMiddleware");
+const hardSkillController = require("../../controllers/skills/hardSkillController");
+const { skillUpload } = require("../../middleswares/uploadMiddleware");
 
 router.post(
   "/",

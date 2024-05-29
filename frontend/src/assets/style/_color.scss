@@ -3,10 +3,8 @@ $dark-primary: #12728d;
 $light-primary: #97ccdb;
 
 $secondary: #be8242;
-$dark-secondary: #94632f;
 
-$false: #f07054;
-$dark-false: #c45e47;
+$false: #d85b3f;
 $true: #739b2d;
 
 $light: #efefef;
@@ -24,22 +22,22 @@ $grey-3: #e0e0e0;
   }
 }
 
-.bg-secondary {
-  background: $dark-secondary;
-
-  p {
-    color: $light;
-  }
-}
-
 .bg-warning {
-  background: $dark-false;
+  background: $false;
 
   p {
-    color: $light;
+    color: $dark;
   }
 }
 
 .bg-grey-3 {
   background: $grey-3;
+}
+
+.bg-grey-1 {
+  background: $grey-1;
+
+  p {
+    color: $light;
+  }
 }

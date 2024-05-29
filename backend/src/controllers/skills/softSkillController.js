@@ -1,31 +1,31 @@
-const HardSkill = require("../models/HardSkill");
+const SoftSkill = require("../../models/skills/SoftSkill");
 const fs = require("fs");
 
-exports.createHardSkill = async (req, res) => {
-  const { name, mastery } = req.body;
+exports.createSoftSkill = async (req, res) => {
+  const { name } = req.body;
   const svg_path = req.file ? req.file.path : null;
 
   try {
-    const hardSkill = await HardSkill.create({ name, svg_path, mastery });
-    res.status(201).json(hardSkill);
+    const softSkill = await SoftSkill.create({ name, svg_path });
+    res.status(201).json(softSkill);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.getAllHardSkills = async (req, res) => {
+exports.getAllSoftSkills = async (req, res) => {
   try {
-    const hardSkills = await HardSkill.findAll();
-    res.status(200).json(hardSkills);
+    const softSkills = await SoftSkill.findAll();
+    res.status(200).json(softSkills);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-exports.deleteHardSkill = async (req, res) => {
+exports.deleteSoftSkill = async (req, res) => {
   try {
     const { id } = req.params;
-    const skill = await HardSkill.findByPk(id);
+    const skill = await SoftSkill.findByPk(id);
 
     if (!skill) {
       return res.status(404).send("Skill not found");
@@ -44,32 +44,31 @@ exports.deleteHardSkill = async (req, res) => {
   }
 };
 
-exports.updateHardSkill = async (req, res) => {
+exports.updateSoftSkill = async (req, res) => {
   const { id } = req.params;
-  const { name, mastery } = req.body;
+  const { name } = req.body;
   const newSvgPath = req.file ? req.file.path : null;
 
   try {
-    const hardSkill = await HardSkill.findByPk(id);
+    const softSkill = await SoftSkill.findByPk(id);
 
-    if (!hardSkill) {
+    if (!softSkill) {
       return res.status(404).send("Skill not found");
     }
 
-    if (newSvgPath && hardSkill.svg_path) {
-      fs.unlink(hardSkill.svg_path, (err) => {
+    if (newSvgPath && softSkill.svg_path) {
+      fs.unlink(softSkill.svg_path, (err) => {
         if (err) {
           return res.status(500).send("Failed to delete old image file");
         }
       });
     }
 
-    hardSkill.name = name || hardSkill.name;
-    hardSkill.mastery = mastery || hardSkill.mastery;
-    hardSkill.svg_path = newSvgPath || hardSkill.svg_path;
+    softSkill.name = name || softSkill.name;
+    softSkill.svg_path = newSvgPath || softSkill.svg_path;
 
-    await hardSkill.save();
-    res.status(200).json(hardSkill);
+    await softSkill.save();
+    res.status(200).json(softSkill);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
