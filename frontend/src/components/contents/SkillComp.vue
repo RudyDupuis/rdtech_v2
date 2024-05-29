@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GetSkill } from '@/entities/Skill'
+import type { GetSkill } from '@/entities/skills/Skill'
 import { onMounted, ref, watch } from 'vue'
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const svgContent = ref()
+const svgContent = ref<string>()
 
 function fetchSvg() {
   fetch(import.meta.env.VITE_BACKEND_URL + props.skill.svg_path)
@@ -31,6 +31,7 @@ onMounted(() => {
 
 <template>
   <div class="f-col a-cent">
+    <!-- TODO à sécuriser -->
     <div v-html="svgContent" :class="`skill-size-${props.size} skill-color-${props.color}`"></div>
     <p class="text-a-cent" :style="`font-size: ${size == 'small' ? 10 : 12}px;`">
       {{ skill.name }}

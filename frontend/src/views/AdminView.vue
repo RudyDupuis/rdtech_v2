@@ -1,41 +1,33 @@
 <script setup lang="ts">
-import SkillComp from '@/components/content/SkillComp.vue'
-import { GetSkill, type PostSkill } from '@/entities/Skill'
+import SkillComp from '@/components/contents/SkillComp.vue'
+import SkillForm from '@/components/forms/SkillForm.vue'
+import { type GetHardSkill, PutHardSkill } from '@/entities/skills/HardSkill'
+import { PutSoftSkill, type GetSoftSkill } from '@/entities/skills/SoftSkill'
 import { ApiMethods } from '@/helpers/ApiMethods'
 import { onMounted, ref } from 'vue'
 
 const api = new ApiMethods()
-const skill = ref<PostSkill>({ name: '', type: 'softSkill', mastery: 'beginner', svg: null })
-const skills = ref<Array<GetSkill>>([])
-
-async function handleSubmit() {
-  try {
-    await api.postData('skills', skill.value)
-    skill.value = { name: '', type: 'softSkill', mastery: 'beginner', svg: null }
-    getSkills()
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
-async function handleDelete(skillId: string) {
-  try {
-    await api.deleteData('skills/' + skillId)
-    getSkills()
-  } catch (error) {
-    console.error('Error:', error)
-  }
-}
-
-function handleFileUpload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) {
-    skill.value.svg = file
-  }
-}
+const softSkills = ref<Array<GetSoftSkill>>([])
+const hardSkills = ref<Array<GetHardSkill>>([])
+const editingSkill = ref<PutSoftSkill | PutHardSkill | undefined>(undefined)
 
 function getSkills() {
-  api.getData('skills').then((returnedValue) => (skills.value = returnedValue))
+  api
+    .getData('hard-skills')
+    .then(
+      (returnedValue) =>
+        (hardSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
+          a.name.localeCompare(b.name)
+        ))
+    )
+  api
+    .getData('soft-skills')
+    .then(
+      (returnedValue) =>
+        (softSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
+          a.name.localeCompare(b.name)
+        ))
+    )
 }
 
 onMounted(() => {
@@ -44,39 +36,65 @@ onMounted(() => {
 </script>
 
 <template>
-  <section>
-    <h2 class="mb3">Ajouter une nouvelle compétence</h2>
-    <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mb3">
-      <input type="text" placeholder="Nom" v-model="skill.name" required />
-
-      <select placeholder="Type" v-model="skill.type" required>
-        <option value="softSkill">Soft Skill</option>
-        <option value="hardSkill">Hard Skill</option>
-      </select>
-
-      <select placeholder="Maîtrise" v-model="skill.mastery" required>
-        <option value="advanced">Avancé</option>
-        <option value="intermediate">Intermédiaire</option>
-        <option value="beginner">Débutant</option>
-      </select>
-
-      <label for="svg_path">SVG | 80px par 80px | Ex nommage: 'Vue-js.svg'</label>
-      <input type="file" id="svg_path" accept=".svg" @change="handleFileUpload" required />
-
-      <button type="submit">Ajouter</button>
-    </form>
-    <section class="f a-cent j-betw f-wrap prl3">
+  <section class="f-col a-cent prl4">
+    <h2 class="mb2">Gestion des compétence</h2>
+    <skill-form :skill="editingSkill" :getSkills="getSkills" />
+    <h3 class="mb2">Soft Skill</h3>
+    <div class="skill-list">
       <div
-        v-for="(skill, index) in skills"
+        v-for="(skill, index) in softSkills"
         :key="index"
-        class="mb1"
-        style="cursor: pointer"
-        @dblclick="handleDelete(skill.id)"
+        class="mb2"
+        @click="editingSkill = new PutSoftSkill(skill.id, skill.name, null, skill.svg_path)"
       >
+        <p>{{ skill.id }}</p>
         <skill-comp :skill="skill" color="grey" size="small" />
-        <p class="text-a-cent" style="font-size: 10px">{{ skill.mastery }}</p>
-        <p class="text-a-cent" style="font-size: 10px">{{ skill.type }}</p>
       </div>
-    </section>
+    </div>
+
+    <h3 class="mb2">Hard Skill</h3>
+    <div class="skill-list">
+      <div
+        v-for="(skill, index) in hardSkills"
+        :key="index"
+        class="mb2"
+        @click="
+          editingSkill = new PutHardSkill(skill.id, skill.name, null, skill.svg_path, skill.mastery)
+        "
+      >
+        <p>{{ skill.id }}</p>
+        <skill-comp :skill="skill" color="grey" size="small" />
+        <p class="text-a-cent">{{ skill.mastery }}</p>
+      </div>
+    </div>
   </section>
 </template>
+
+<style scoped lang="scss">
+.skill-list {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(10, 1fr);
+  justify-items: center;
+
+  p {
+    font-size: 10px;
+  }
+  div {
+    cursor: pointer;
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(7, 1fr);
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+</style>

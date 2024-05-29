@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, useRoute } from 'vue-router'
-import LogoSvg from '@/components/svg/logo/logoSvg.vue'
+import LogoSvg from '@/components/svgs/logos/logoSvg.vue'
 import useIsSmallScreen from '@/helpers/useIsSmallScreen'
 
 const route = useRoute()

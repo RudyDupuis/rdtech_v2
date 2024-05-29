@@ -20,6 +20,19 @@ export class ApiMethods {
     return response.json()
   }
 
+  async putData(endpoint: string, data: any) {
+    const url = `${this.baseUrl}${endpoint}`
+    const formData = new FormData()
+    for (const key in data) {
+      formData.append(key, data[key])
+    }
+    const response = await fetch(url, {
+      method: 'PUT',
+      body: formData
+    })
+    return response.json()
+  }
+
   async deleteData(endpoint: string) {
     const url = `${this.baseUrl}${endpoint}`
     await fetch(url, {

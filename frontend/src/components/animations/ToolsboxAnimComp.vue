@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import HammerSvg from '@/components/svg/toolsbox/hammerSvg.vue'
-import SawSvg from '@/components/svg/toolsbox/sawSvg.vue'
-import ScrewdriverSvg from '@/components/svg/toolsbox/screwdriverSvg.vue'
-import SpannerSvg from '@/components/svg/toolsbox/spannerSvg.vue'
-import TapeMeasureSvg from '@/components/svg/toolsbox/tapeMeasureSvg.vue'
-import ToolsboxBackSvg from '@/components/svg/toolsbox/toolsboxBackSvg.vue'
-import ToolsboxFrontSvg from '@/components/svg/toolsbox/toolsboxFrontSvg.vue'
-import ToolsboxMiddleSvg from '@/components/svg/toolsbox/toolsboxMiddleSvg.vue'
+import HammerSvg from '@/components/svgs/toolsbox/hammerSvg.vue'
+import SawSvg from '@/components/svgs/toolsbox/sawSvg.vue'
+import ScrewdriverSvg from '@/components/svgs/toolsbox/screwdriverSvg.vue'
+import SpannerSvg from '@/components/svgs/toolsbox/spannerSvg.vue'
+import TapeMeasureSvg from '@/components/svgs/toolsbox/tapeMeasureSvg.vue'
+import ToolsboxBackSvg from '@/components/svgs/toolsbox/toolsboxBackSvg.vue'
+import ToolsboxFrontSvg from '@/components/svgs/toolsbox/toolsboxFrontSvg.vue'
+import ToolsboxMiddleSvg from '@/components/svgs/toolsbox/toolsboxMiddleSvg.vue'
 </script>
 
 <template>

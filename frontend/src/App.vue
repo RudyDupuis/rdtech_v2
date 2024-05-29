@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import FooterComp from '@/components/layout/FooterComp.vue'
-import HeaderComp from '@/components/layout/HeaderComp.vue'
+import FooterComp from '@/components/layouts/FooterComp.vue'
+import HeaderComp from '@/components/layouts/HeaderComp.vue'
 </script>
 
 <template>

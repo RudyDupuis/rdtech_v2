@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import ToolsboxAnimComp from '@/components/animation/ToolsboxAnimComp.vue'
-import SkillComp from '@/components/content/SkillComp.vue'
-import { GetSkill } from '@/entities/Skill'
+import ToolsboxAnimComp from '@/components/animations/ToolsboxAnimComp.vue'
+import SkillComp from '@/components/contents/SkillComp.vue'
+import type { GetHardSkill } from '@/entities/skills/HardSkill'
+import type { GetSoftSkill } from '@/entities/skills/SoftSkill'
 import { ApiMethods } from '@/helpers/ApiMethods'
 import useIsSmallScreen from '@/helpers/useIsSmallScreen'
 import { computed, onMounted, ref } from 'vue'
@@ -9,29 +10,37 @@ import { computed, onMounted, ref } from 'vue'
 const isSmallScreen = useIsSmallScreen()
 
 const api = new ApiMethods()
-const softSkills = ref<Array<GetSkill>>([])
-const hardSkills = ref<Array<GetSkill>>([])
-const skillsFilter = ref<GetSkill['mastery'] | null>(null)
-const filteredHardSkills = computed<Array<GetSkill>>(() => {
-  if (skillsFilter.value === null) {
+const softSkills = ref<Array<GetSoftSkill>>([])
+const hardSkills = ref<Array<GetHardSkill>>([])
+const hardSkillsFilter = ref<GetHardSkill['mastery'] | null>(null)
+const filteredHardSkills = computed<Array<GetHardSkill>>(() => {
+  if (hardSkillsFilter.value === null) {
     return hardSkills.value
   }
-  return hardSkills.value.filter((skill) => skill.mastery === skillsFilter.value)
+  return hardSkills.value.filter((skill) => skill.mastery === hardSkillsFilter.value)
 })
 
-function toggleFilter(filter: GetSkill['mastery']) {
-  skillsFilter.value = skillsFilter.value === filter ? null : filter
+function toggleFilter(filter: GetHardSkill['mastery']) {
+  hardSkillsFilter.value = hardSkillsFilter.value === filter ? null : filter
 }
 
 onMounted(() => {
-  api.getData('skills').then((returnedValue) =>
-    returnedValue
-      .sort((a: GetSkill, b: GetSkill) => a.name.localeCompare(b.name))
-      .forEach((value: GetSkill) => {
-        value.type === 'softSkill' && softSkills.value.push(value)
-        value.type === 'hardSkill' && hardSkills.value.push(value)
-      })
-  )
+  api
+    .getData('hard-skills')
+    .then(
+      (returnedValue) =>
+        (hardSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
+          a.name.localeCompare(b.name)
+        ))
+    )
+  api
+    .getData('soft-skills')
+    .then(
+      (returnedValue) =>
+        (softSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
+          a.name.localeCompare(b.name)
+        ))
+    )
 })
 </script>
 
@@ -89,21 +98,21 @@ onMounted(() => {
         <div class="button-list f a-cent j-betw mb2">
           <button
             class="choice-button"
-            :class="{ 'choice-button--active': skillsFilter === 'advanced' }"
+            :class="{ 'choice-button--active': hardSkillsFilter === 'advanced' }"
             @click="toggleFilter('advanced')"
           >
             Avancé
           </button>
           <button
             class="choice-button ml1"
-            :class="{ 'choice-button--active': skillsFilter === 'intermediate' }"
+            :class="{ 'choice-button--active': hardSkillsFilter === 'intermediate' }"
             @click="toggleFilter('intermediate')"
           >
             Intermédiaire
           </button>
           <button
             class="choice-button ml1"
-            :class="{ 'choice-button--active': skillsFilter === 'beginner' }"
+            :class="{ 'choice-button--active': hardSkillsFilter === 'beginner' }"
             @click="toggleFilter('beginner')"
           >
             Débutant

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import LinkedinLogoSvg from '@/components/svg/logo/linkedinLogoSvg.vue'
-import GithubLogoSvg from '@/components/svg/logo/githubLogoSvg.vue'
+import LinkedinLogoSvg from '@/components/svgs/logos/linkedinLogoSvg.vue'
+import GithubLogoSvg from '@/components/svgs/logos/githubLogoSvg.vue'
 </script>
 
 <template>

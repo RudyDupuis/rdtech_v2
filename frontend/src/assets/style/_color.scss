@@ -3,8 +3,10 @@ $dark-primary: #12728d;
 $light-primary: #97ccdb;
 
 $secondary: #be8242;
+$dark-secondary: #94632f;
 
 $false: #f07054;
+$dark-false: #c45e47;
 $true: #739b2d;
 
 $light: #efefef;
@@ -16,6 +18,22 @@ $grey-3: #e0e0e0;
 /** Background **/
 .bg-primary {
   background: $dark-primary;
+
+  p {
+    color: $light;
+  }
+}
+
+.bg-secondary {
+  background: $dark-secondary;
+
+  p {
+    color: $light;
+  }
+}
+
+.bg-warning {
+  background: $dark-false;
 
   p {
     color: $light;

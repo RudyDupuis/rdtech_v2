@@ -1,16 +1,8 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/sequelize");
 
-const Skill = sequelize.define("Skill", {
+const SoftSkill = sequelize.define("SoftSkill", {
   name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  type: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  mastery: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -20,4 +12,4 @@ const Skill = sequelize.define("Skill", {
   },
 });
 
-module.exports = Skill;
+module.exports = SoftSkill;
