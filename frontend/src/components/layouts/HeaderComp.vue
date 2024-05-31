@@ -14,7 +14,7 @@ const isSmallScreen = useIsSmallScreen()
       <ul class="f">
         <li>
           <router-link
-            to=""
+            :to="{ name: 'myJourney' }"
             class="text-medium"
             :class="{ isCurrentPage: route.path === '/mon-parcours' }"
           >

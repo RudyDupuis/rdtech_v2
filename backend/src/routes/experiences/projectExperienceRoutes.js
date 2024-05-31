@@ -26,5 +26,9 @@ router.post(
   experienceUpload.none(),
   projectExperienceController.removeProjectExperienceImage
 );
+router.get(
+  "/favorites",
+  projectExperienceController.getAllFavoriteProjectExperiences
+);
 
 module.exports = router;

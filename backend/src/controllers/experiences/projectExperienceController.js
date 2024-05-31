@@ -200,3 +200,18 @@ exports.removeProjectExperienceImage = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.getAllFavoriteProjectExperiences = async (req, res) => {
+  try {
+    const projectExperiences = await ProjectExperience.findAll({
+      where: { is_favorite: true },
+      include: {
+        model: HardSkill,
+        as: "hard_skills",
+      },
+    });
+    res.status(200).json(projectExperiences);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

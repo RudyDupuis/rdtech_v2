@@ -62,6 +62,10 @@ a:visited {
 }
 a:hover {
   color: $secondary;
+
+  p {
+    color: $secondary;
+  }
 }
 
 .isCurrentPage {

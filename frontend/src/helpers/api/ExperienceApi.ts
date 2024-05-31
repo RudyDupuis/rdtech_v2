@@ -37,6 +37,22 @@ export class ExperienceApi {
     }
   }
 
+  async getAllFavoriteProjectExperiences(): Promise<Array<GetProjectExperience>> {
+    try {
+      const rawProjectExperiences = await this.api.getData('project-experiences/favorites')
+      const projectExperiences = rawProjectExperiences.map((value: ProjectExperienceJson) =>
+        this.projectMapper.jsonToGetProjectExperience(value)
+      )
+
+      return projectExperiences.sort(
+        (a: GetProjectExperience, b: GetProjectExperience) =>
+          a.start_date.getTime() - b.start_date.getTime()
+      )
+    } catch (error) {
+      throw new Error(`Error fetching project experiences: ${error}`)
+    }
+  }
+
   async getAllJobExperiences(): Promise<Array<GetJobExperience>> {
     try {
       const rawJobExperiences = await this.api.getData('job-experiences')

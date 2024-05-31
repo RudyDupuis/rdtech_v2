@@ -1,0 +1,231 @@
+<script setup lang="ts">
+import ExperienceComp from '@/components/contents/ExperienceComp.vue'
+import SkillComp from '@/components/contents/SkillComp.vue'
+import { GetExperience } from '@/entities/experiences/Experience'
+import { GetJobExperience } from '@/entities/experiences/JobExperience'
+import { GetProjectExperience } from '@/entities/experiences/ProjectExperience'
+import { GetTrainingExperience } from '@/entities/experiences/TrainingExperience'
+import { GetHardSkill } from '@/entities/skills/HardSkill'
+import { ExperienceApi } from '@/helpers/api/ExperienceApi'
+import { SkillApi } from '@/helpers/api/SkillApi'
+import { computed, onMounted, ref } from 'vue'
+
+const skillApi = new SkillApi()
+const experienceApi = new ExperienceApi()
+
+const hardSkills = ref<Array<GetHardSkill>>([])
+
+const experiences = ref<Array<GetExperience>>([])
+const experiencesFilter = ref<null | 'project' | 'job' | 'training'>(null)
+const projectsFilter = ref<Array<GetHardSkill['id']>>([])
+const filteredExperiences = computed<Array<GetExperience>>(() => {
+  if (projectsFilter.value.length === 0) {
+    switch (experiencesFilter.value) {
+      case 'project':
+        return experiences.value.filter(
+          (exp): exp is GetProjectExperience => exp instanceof GetProjectExperience
+        )
+      case 'job':
+        return experiences.value.filter(
+          (exp): exp is GetJobExperience => exp instanceof GetJobExperience
+        )
+      case 'training':
+        return experiences.value.filter(
+          (exp): exp is GetTrainingExperience => exp instanceof GetTrainingExperience
+        )
+      default:
+        return experiences.value
+    }
+  }
+
+  return experiences.value
+    .filter((exp): exp is GetProjectExperience => exp instanceof GetProjectExperience)
+    .filter((project: GetProjectExperience) =>
+      projectsFilter.value?.every((filterId) =>
+        project.hard_skills.some((skill) => skill.id === filterId)
+      )
+    )
+})
+
+function toggleExperiencesFilter(filter: 'project' | 'job' | 'training') {
+  projectsFilter.value = []
+  experiencesFilter.value = experiencesFilter.value === filter ? null : filter
+}
+
+function toggleProjectFilterBySkill(filter: GetHardSkill['id']) {
+  if (projectsFilter.value?.includes(filter)) {
+    projectsFilter.value = projectsFilter.value.filter((id) => id !== filter)
+  } else {
+    projectsFilter.value.push(filter)
+  }
+}
+
+onMounted(async () => {
+  hardSkills.value = await skillApi.getAllHardSkills()
+
+  const projectExperiences = await experienceApi.getAllProjectExperiences()
+  const jobExperiences = await experienceApi.getAllJobExperiences()
+  const trainingExperiences = await experienceApi.getAllTrainingExperiences()
+  experiences.value = [...projectExperiences, ...jobExperiences, ...trainingExperiences].sort(
+    (a, b) => {
+      return b.start_date.getTime() - a.start_date.getTime()
+    }
+  )
+})
+</script>
+
+<template>
+  <main>
+    <h1 class="mb3">Mon parcours</h1>
+
+    <a href="#parcours" class="f-col a-cent">
+      <p>Faites défiler pour voir mon parcours</p>
+      <p class="information-arrow">↓</p>
+    </a>
+
+    <section class="f-col a-cent bg-grey-3 ptb2">
+      <h2 class="mb2">Trier</h2>
+      <div class="button-list f a-cent mb2">
+        <button
+          class="choice-button"
+          :class="{
+            'choice-button--active': experiencesFilter === 'project' || projectsFilter.length > 0
+          }"
+          @click="toggleExperiencesFilter('project')"
+        >
+          Projets uniquement
+        </button>
+        <button
+          class="choice-button ml1"
+          :class="{
+            'choice-button--active': experiencesFilter === 'job' && projectsFilter.length === 0
+          }"
+          @click="toggleExperiencesFilter('job')"
+        >
+          Emplois uniquement
+        </button>
+        <button
+          class="choice-button ml1"
+          :class="{
+            'choice-button--active': experiencesFilter === 'training' && projectsFilter.length === 0
+          }"
+          @click="toggleExperiencesFilter('training')"
+        >
+          Formations uniquement
+        </button>
+      </div>
+      <h2 class="mb2">Projet utilisant</h2>
+      <div class="skill-buttons-list">
+        <skill-comp
+          v-for="(skill, index) in hardSkills"
+          :key="index"
+          :skill="skill"
+          :color="projectsFilter.includes(skill.id) ? 'primary' : 'grey'"
+          size="small"
+          @click="toggleProjectFilterBySkill(skill.id)"
+        />
+      </div>
+    </section>
+
+    <section id="parcours" class="f-col a-cent ptb3">
+      <div v-for="(experience, index) in filteredExperiences" :key="index" class="f-col a-cent">
+        <template
+          v-if="
+            index === 0 ||
+            experience.start_date.getFullYear() !==
+              filteredExperiences[index - 1].start_date.getFullYear()
+          "
+        >
+          <div v-if="index !== 0" class="decorative-line bg-primary mb2"></div>
+          <h3 class="mb2">
+            {{ experience.start_date.getFullYear() }}
+          </h3>
+        </template>
+        <div class="decorative-line bg-primary mb2"></div>
+        <experience-comp :experience="experience" class="mb2" />
+      </div>
+      <p v-if="filteredExperiences.length === 0">Aucun résultat ...</p>
+    </section>
+  </main>
+</template>
+
+<style scoped lang="scss">
+.decorative-line {
+  height: 50px;
+  width: 5px;
+  border-radius: 10px;
+}
+
+.information-arrow {
+  font-size: 35px;
+  animation: moving 3s ease-in-out infinite;
+
+  @keyframes moving {
+    0% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(10px);
+    }
+    50% {
+      transform: translateY(2px);
+    }
+    60% {
+      transform: translateY(10px);
+    }
+    70% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+}
+
+.button-list {
+  @media (max-width: 800px) {
+    flex-direction: column;
+    button {
+      margin-left: 0;
+      margin-bottom: 16px;
+      width: 300px;
+    }
+  }
+  @media (max-width: 400px) {
+    button {
+      width: 80vw;
+    }
+  }
+}
+
+.skill-buttons-list {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(14, 1fr);
+  justify-items: center;
+
+  @media (max-width: 1500px) {
+    grid-template-columns: repeat(10, 1fr);
+  }
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  @media (max-width: 800px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  div {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+</style>

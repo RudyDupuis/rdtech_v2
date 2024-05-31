@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { GetHardSkill } from '@/entities/skills/HardSkill'
 import type { GetSoftSkill } from '@/entities/skills/SoftSkill'
+import { capitalizeFirstLetter } from '@/helpers/formatting'
 
 interface Props {
   skill: GetHardSkill | GetSoftSkill
@@ -20,7 +21,7 @@ function isHardSkill(checkingSkill: typeof props.skill): checkingSkill is GetHar
     <img :src="backUrl + skill.svg_path" :alt="'Image de ' + skill.name" />
     <p>{{ skill.name }}</p>
     <p v-if="isHardSkill(skill)">
-      {{ skill.mastery.charAt(0).toUpperCase() + skill.mastery.slice(1) }}
+      {{ capitalizeFirstLetter(skill.mastery) }}
     </p>
   </div>
 </template>

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import ToolsboxAnimComp from '@/components/animations/ToolsboxAnimComp.vue'
+import ExperienceComp from '@/components/contents/ExperienceComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
+import { GetProjectExperience } from '@/entities/experiences/ProjectExperience'
 import type { GetHardSkill } from '@/entities/skills/HardSkill'
 import type { GetSoftSkill } from '@/entities/skills/SoftSkill'
+import { ExperienceApi } from '@/helpers/api/ExperienceApi'
 import { SkillApi } from '@/helpers/api/SkillApi'
 import useIsSmallScreen from '@/helpers/useIsSmallScreen'
 import { computed, onMounted, ref } from 'vue'
@@ -10,6 +13,10 @@ import { computed, onMounted, ref } from 'vue'
 const isSmallScreen = useIsSmallScreen()
 
 const skillApi = new SkillApi()
+
+const experienceApi = new ExperienceApi()
+const favoriteProjects = ref<Array<GetProjectExperience>>([])
+
 const softSkills = ref<Array<GetSoftSkill>>([])
 const hardSkills = ref<Array<GetHardSkill>>([])
 const hardSkillsFilter = ref<GetHardSkill['mastery'] | null>(null)
@@ -25,6 +32,7 @@ function toggleFilter(filter: GetHardSkill['mastery']) {
 }
 
 onMounted(async () => {
+  favoriteProjects.value = await experienceApi.getAllFavoriteProjectExperiences()
   softSkills.value = await skillApi.getAllSoftSkills()
   hardSkills.value = await skillApi.getAllHardSkills()
 })
@@ -127,9 +135,17 @@ onMounted(async () => {
       </div>
     </section>
 
-    <section id="favorite-projects">
+    <section id="favorite-projects" class="f-col a-cent">
       <h2 class="mb3">Mes projets favoris</h2>
-      <router-link to="" class="button">Voir mon parcours</router-link>
+      <div class="w100 f f-wrap j-even">
+        <experience-comp
+          v-for="(project, index) in favoriteProjects"
+          :key="index"
+          :experience="project"
+          class="mb3"
+        />
+      </div>
+      <router-link :to="{ name: 'myJourney' }" class="button mb4">Voir mon parcours</router-link>
     </section>
   </main>
 </template>
