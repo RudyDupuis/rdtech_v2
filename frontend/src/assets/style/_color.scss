@@ -13,6 +13,11 @@ $grey-1: #7a7a7a;
 $grey-2: #b8b8b8;
 $grey-3: #e0e0e0;
 
+/** Text **/
+.text-error {
+  color: $false;
+}
+
 /** Background **/
 .bg-primary {
   background: $dark-primary;

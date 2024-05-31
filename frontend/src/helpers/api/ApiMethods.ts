@@ -11,7 +11,13 @@ export class ApiMethods {
     const url = `${this.baseUrl}${endpoint}`
     const formData = new FormData()
     for (const key in data) {
-      formData.append(key, data[key])
+      if (Array.isArray(data[key]) && data[key][0] instanceof File) {
+        data[key].forEach((file: File) => {
+          formData.append(`${key}`, file)
+        })
+      } else {
+        formData.append(key, data[key])
+      }
     }
     const response = await fetch(url, {
       method: 'POST',
@@ -24,7 +30,13 @@ export class ApiMethods {
     const url = `${this.baseUrl}${endpoint}`
     const formData = new FormData()
     for (const key in data) {
-      formData.append(key, data[key])
+      if (Array.isArray(data[key]) && data[key][0] instanceof File) {
+        data[key].forEach((file: File) => {
+          formData.append(`${key}`, file)
+        })
+      } else {
+        formData.append(key, data[key])
+      }
     }
     const response = await fetch(url, {
       method: 'PUT',

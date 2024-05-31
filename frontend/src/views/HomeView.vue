@@ -3,13 +3,13 @@ import ToolsboxAnimComp from '@/components/animations/ToolsboxAnimComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
 import type { GetHardSkill } from '@/entities/skills/HardSkill'
 import type { GetSoftSkill } from '@/entities/skills/SoftSkill'
-import { ApiMethods } from '@/helpers/ApiMethods'
+import { SkillApi } from '@/helpers/api/SkillApi'
 import useIsSmallScreen from '@/helpers/useIsSmallScreen'
 import { computed, onMounted, ref } from 'vue'
 
 const isSmallScreen = useIsSmallScreen()
 
-const api = new ApiMethods()
+const skillApi = new SkillApi()
 const softSkills = ref<Array<GetSoftSkill>>([])
 const hardSkills = ref<Array<GetHardSkill>>([])
 const hardSkillsFilter = ref<GetHardSkill['mastery'] | null>(null)
@@ -24,23 +24,9 @@ function toggleFilter(filter: GetHardSkill['mastery']) {
   hardSkillsFilter.value = hardSkillsFilter.value === filter ? null : filter
 }
 
-onMounted(() => {
-  api
-    .getData('hard-skills')
-    .then(
-      (returnedValue) =>
-        (hardSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
-          a.name.localeCompare(b.name)
-        ))
-    )
-  api
-    .getData('soft-skills')
-    .then(
-      (returnedValue) =>
-        (softSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
-          a.name.localeCompare(b.name)
-        ))
-    )
+onMounted(async () => {
+  softSkills.value = await skillApi.getAllSoftSkills()
+  hardSkills.value = await skillApi.getAllHardSkills()
 })
 </script>
 
@@ -87,11 +73,11 @@ onMounted(() => {
           Contactez moi pour discuter de vos besoins en développement web et UX design. Ensemble,
           nous réaliserons votre projet numérique.
         </p>
-        <router-link to="/me-contacter" class="button">Me contacter</router-link>
+        <router-link to="" class="button">Me contacter</router-link>
       </div>
     </section>
 
-    <section id="skills" class="f-col a-cent bg-grey-3 ptb3">
+    <section id="skills" class="f-col a-cent bg-grey-3 ptb3 mb4">
       <h2 class="mb3">Mes compétences</h2>
       <div class="prl2">
         <h3 class="mb2">Hard skills</h3>
@@ -139,6 +125,11 @@ onMounted(() => {
           />
         </div>
       </div>
+    </section>
+
+    <section id="favorite-projects">
+      <h2 class="mb3">Mes projets favoris</h2>
+      <router-link to="" class="button">Voir mon parcours</router-link>
     </section>
   </main>
 </template>

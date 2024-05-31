@@ -16,7 +16,7 @@ const ProjectExperience = sequelize.define("ProjectExperience", {
     allowNull: true,
   },
   short_desc: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   thumbnail_path: {
@@ -24,7 +24,7 @@ const ProjectExperience = sequelize.define("ProjectExperience", {
     allowNull: true,
   },
   long_desc: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   images_path: {
@@ -51,5 +51,6 @@ const ProjectExperience = sequelize.define("ProjectExperience", {
 
 ProjectExperience.belongsToMany(HardSkill, {
   through: "ProjectExperienceHardSkills",
+  as: "hard_skills",
 });
 module.exports = ProjectExperience;

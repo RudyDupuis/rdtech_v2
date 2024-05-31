@@ -8,21 +8,42 @@ import {
   PostTrainingExperience,
   PutTrainingExperience
 } from '@/entities/experiences/TrainingExperience'
-import { ApiMethods } from '@/helpers/ApiMethods'
-import { computed, ref, watch } from 'vue'
+import type { GetHardSkill } from '@/entities/skills/HardSkill'
+import { ApiMethods } from '@/helpers/api/ApiMethods'
+import { SkillApi } from '@/helpers/api/SkillApi'
+import { JobExperienceMapper } from '@/helpers/mappers/experiences/JobExperienceMapper'
+import { ProjectExperienceMapper } from '@/helpers/mappers/experiences/ProjectExperienceMapper'
+import { TrainingExperienceMapper } from '@/helpers/mappers/experiences/TrainingExperienceMapper'
+import { computed, onMounted, ref, watch } from 'vue'
 
 interface Props {
   getExperiences: () => void
   experience?: PutJobExperience | PutTrainingExperience | PutProjectExperience
 }
 const props = defineProps<Props>()
-const api = new ApiMethods()
 
+const api = new ApiMethods()
+const projectExperienceMapper = new ProjectExperienceMapper()
+const jobExperienceMapper = new JobExperienceMapper()
+const trainningExperienceMapper = new TrainingExperienceMapper()
+
+const skillApi = new SkillApi()
+const hardSkills = ref<Array<GetHardSkill>>([])
+
+const backUrl = import.meta.env.VITE_BACKEND_URL
 const thumbnailInput = ref<HTMLInputElement | null>(null)
 const thumbnailUrl = computed<string>(() => {
   return isPutExperience(editingExperience.value)
-    ? import.meta.env.VITE_BACKEND_URL + editingExperience.value.thumbnail_path
+    ? backUrl + editingExperience.value.thumbnail_path
     : ''
+})
+const imagesInput = ref<HTMLInputElement | null>(null)
+const imagesUrl = computed<Array<string>>(() => {
+  let urls: Array<string> = []
+  if (isPutExperience(editingExperience.value) && isProjectExperience(editingExperience.value)) {
+    editingExperience.value.images_path?.forEach((path) => urls.push(backUrl + path))
+  }
+  return urls
 })
 
 const selectedtype = ref<'projectExperience' | 'jobExperience' | 'trainingExperience'>(
@@ -35,7 +56,7 @@ const editingExperience = ref<
   | PostJobExperience
   | PostTrainingExperience
   | PostProjectExperience
->(new PostProjectExperience('', new Date(), null, '', null, '', [], null, null, null, null, false))
+>(projectExperienceMapper.emptyPostProjectExperience())
 
 const experienceType = computed<
   'project-experiences' | 'job-experiences' | 'training-experiences' | undefined
@@ -87,28 +108,29 @@ function isTrainingExperience(
 }
 
 function resetForm() {
-  editingExperience.value = new PostProjectExperience(
-    '',
-    new Date(),
-    null,
-    '',
-    null,
-    '',
-    [],
-    null,
-    null,
-    null,
-    null,
-    false
-  )
-  selectedtype.value = 'projectExperience'
+  switch (selectedtype.value) {
+    case 'projectExperience':
+      editingExperience.value = projectExperienceMapper.emptyPostProjectExperience()
+      break
+    case 'jobExperience':
+      editingExperience.value = jobExperienceMapper.emptyPostJobExperience()
+      break
+    case 'trainingExperience':
+      editingExperience.value = trainningExperienceMapper.emptyPostTrainingExperience()
+      break
+    default:
+      editingExperience.value = projectExperienceMapper.emptyPostProjectExperience()
+  }
   if (thumbnailInput.value) {
     thumbnailInput.value.value = ''
+  }
+  if (imagesInput.value) {
+    imagesInput.value.value = ''
   }
 }
 
 const computedStartDateGetStringSetDate = computed({
-  get: () => new Date(editingExperience.value.start_date).toISOString().split('T')[0],
+  get: () => editingExperience.value.start_date.toISOString().split('T')[0],
   set: (value: string) => {
     editingExperience.value.start_date = new Date(value)
   }
@@ -116,11 +138,11 @@ const computedStartDateGetStringSetDate = computed({
 
 const computedEndDateGetStringSetDate = computed({
   get: () =>
-    editingExperience.value.end_date
-      ? new Date(editingExperience.value.end_date).toISOString().split('T')[0]
+    editingExperience.value.end_date !== null
+      ? editingExperience.value.end_date.toISOString().split('T')[0]
       : '',
   set: (value: string) => {
-    editingExperience.value.end_date = value ? new Date(value) : null
+    editingExperience.value.end_date = value !== '' ? new Date(value) : null
   }
 })
 
@@ -144,10 +166,17 @@ async function handleSubmit() {
   }
 }
 
-function handleFileUpload(event: Event) {
+function handleThumbnailUpload(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
     editingExperience.value.thumbnail = file
+  }
+}
+
+function handleImagesUpload(event: Event) {
+  const files = (event.target as HTMLInputElement).files
+  if (files && isProjectExperience(editingExperience.value)) {
+    editingExperience.value.images = Array.from(files)
   }
 }
 
@@ -163,28 +192,29 @@ async function handleDelete() {
   }
 }
 
+async function handleRemoveImage(imagePath: string) {
+  try {
+    if (isPutExperience(editingExperience.value)) {
+      await api.postData(experienceType.value + '/remove-image/' + editingExperience.value.id, {
+        image_path: imagePath
+      })
+      resetForm()
+      props.getExperiences()
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
 watch(selectedtype, () => {
   editingExperience.value = (() => {
     switch (selectedtype.value) {
       case 'projectExperience':
-        return new PostProjectExperience(
-          '',
-          new Date(),
-          null,
-          '',
-          null,
-          '',
-          [],
-          null,
-          null,
-          null,
-          null,
-          false
-        )
+        return projectExperienceMapper.emptyPostProjectExperience()
       case 'jobExperience':
-        return new PostJobExperience('', new Date(), null, '', null)
+        return jobExperienceMapper.emptyPostJobExperience()
       case 'trainingExperience':
-        return new PostTrainingExperience('', new Date(), null, '', null)
+        return trainningExperienceMapper.emptyPostTrainingExperience()
     }
   })()
 })
@@ -196,6 +226,10 @@ watch(
     }
   }
 )
+
+onMounted(async () => {
+  hardSkills.value = await skillApi.getAllHardSkills()
+})
 </script>
 
 <template>
@@ -204,39 +238,119 @@ watch(
       {{ (isPostExperience(editingExperience) ? 'Créer' : 'Modifier ') + ' une expérience' }}
     </h3>
 
-    <select v-if="isPostExperience(editingExperience)" v-model="selectedtype" placeholder="Type">
+    <label v-if="isPostExperience(editingExperience)" for="type" class="text-a-cent">Type</label>
+    <select id="type" v-if="isPostExperience(editingExperience)" v-model="selectedtype">
       <option value="projectExperience">Projets</option>
       <option value="jobExperience">Emplois</option>
       <option value="trainingExperience">Formations</option>
     </select>
 
-    <img
-      v-if="isPutExperience(editingExperience)"
-      :src="thumbnailUrl"
-      :alt="'Image de ' + editingExperience.title"
-      style="width: 300px; height: auto"
-      class="mb1"
-    />
+    <div
+      v-if="isPutExperience(editingExperience) && editingExperience.thumbnail_path !== null"
+      class="remove-img mb1"
+      @dblclick="handleRemoveImage(editingExperience.thumbnail_path)"
+    >
+      <p class="text-a-cent larger-text">Miniature</p>
+      <img
+        :src="thumbnailUrl"
+        :alt="'Miniature de ' + editingExperience.title"
+        style="width: 300px; height: auto"
+        class="mb1"
+      />
+      <p class="text-error text-a-cent">Double cliquer pour supprimer l'image</p>
+    </div>
+
+    <div v-if="isPutExperience(editingExperience) && imagesUrl.length > 0" class="remove-img mb1">
+      <p class="text-a-cent larger-text">Images</p>
+      <div
+        v-for="(url, index) in imagesUrl"
+        :key="index"
+        @dblclick="handleRemoveImage(url.replace(backUrl, ''))"
+      >
+        <img
+          :src="url"
+          :alt="'Image de ' + editingExperience.title"
+          style="width: 300px; height: auto"
+          class="mb1"
+        />
+        <p class="text-error text-a-cent">Double cliquer pour supprimer l'image</p>
+      </div>
+    </div>
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mb1">
-      <input v-model="editingExperience.title" type="text" placeholder="Titre" required />
-      <label for="start_date" class="text-a-cent">Date de début</label>
+      <input v-model="editingExperience.title" type="text" placeholder="Titre *" required />
+      <label for="start_date" class="text-a-cent">Date de début *</label>
       <input id="start_date" v-model="computedStartDateGetStringSetDate" type="date" required />
       <label for="end_date" class="text-a-cent">Date de fin</label>
       <input id="end_date" v-model="computedEndDateGetStringSetDate" type="date" />
       <textarea
         v-model="editingExperience.short_desc"
-        placeholder="Description courte"
+        placeholder="Description courte *"
         required
       ></textarea>
-      <label for="thumbnail" class="text-a-cent">PNG - 1000px par 500px</label>
+      <label for="thumbnail" class="text-a-cent">Miniature | PNG - 1000px par 500px</label>
       <input
         ref="thumbnailInput"
         type="file"
         id="thumbnail"
         accept=".png"
-        @change="handleFileUpload"
+        @change="handleThumbnailUpload"
       />
+      <textarea
+        v-if="isProjectExperience(editingExperience)"
+        v-model="editingExperience.long_desc"
+        placeholder="Description longue *"
+        rows="5"
+        required
+      ></textarea>
+      <label v-if="isProjectExperience(editingExperience)" for="hardskills" class="text-a-cent">
+        Hard skills liés *
+      </label>
+      <select
+        id="hardskills"
+        v-if="isProjectExperience(editingExperience)"
+        v-model="editingExperience.hard_skill_ids"
+        multiple
+        required
+      >
+        <option v-for="(hardskill, index) in hardSkills" :key="index" :value="hardskill.id">
+          {{ hardskill.name }}
+        </option>
+      </select>
+      <label v-if="isProjectExperience(editingExperience)" for="images" class="text-a-cent"
+        >Images | PNG - 1000px par 500px</label
+      >
+      <input
+        v-if="isProjectExperience(editingExperience)"
+        ref="imagesInput"
+        type="file"
+        id="images"
+        accept=".png"
+        multiple
+        @change="handleImagesUpload"
+      />
+      <input
+        v-if="isProjectExperience(editingExperience)"
+        v-model="editingExperience.project_link"
+        type="text"
+        placeholder="Lien du projet"
+      />
+      <input
+        v-if="isProjectExperience(editingExperience)"
+        v-model="editingExperience.code_link"
+        type="text"
+        placeholder="Lien du dépot de code"
+      />
+      <input
+        v-if="isProjectExperience(editingExperience)"
+        v-model="editingExperience.doc_link"
+        type="text"
+        placeholder="Lien de la documentation"
+      />
+      <div v-if="isProjectExperience(editingExperience)" class="f a-cent j-betw mb2">
+        <input v-model="editingExperience.is_favorite" id="favorite" type="checkbox" />
+        <label for="favorite" class="text-a-cent ml2">Ajouter aux favories</label>
+      </div>
 
       <div class="list-button f a-cent">
         <button
@@ -273,5 +387,9 @@ watch(
       margin-top: 16px;
     }
   }
+}
+
+.remove-img {
+  cursor: pointer;
 }
 </style>

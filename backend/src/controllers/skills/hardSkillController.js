@@ -64,8 +64,8 @@ exports.updateHardSkill = async (req, res) => {
       });
     }
 
-    hardSkill.name = name || hardSkill.name;
-    hardSkill.mastery = mastery || hardSkill.mastery;
+    hardSkill.name = name;
+    hardSkill.mastery = mastery;
     hardSkill.svg_path = newSvgPath || hardSkill.svg_path;
 
     await hardSkill.save();

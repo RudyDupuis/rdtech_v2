@@ -6,7 +6,7 @@ form {
   position: relative;
 }
 
-input,
+input:not([type='checkbox']),
 select,
 textarea {
   padding: 10px 20px;

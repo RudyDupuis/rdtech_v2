@@ -15,5 +15,10 @@ router.put(
   experienceUpload.single("thumbnail"),
   jobExperienceController.updateJobExperience
 );
+router.post(
+  "/remove-image/:id",
+  experienceUpload.none(),
+  jobExperienceController.removeJobExperienceImage
+);
 
 module.exports = router;

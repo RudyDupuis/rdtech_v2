@@ -9,7 +9,7 @@ exports.createJobExperience = async (req, res) => {
     const jobExperience = await JobExperience.create({
       title,
       start_date,
-      end_date,
+      end_date: end_date !== "null" ? end_date : null,
       short_desc,
       thumbnail_path,
     });
@@ -29,8 +29,9 @@ exports.getAllJobExperiences = async (req, res) => {
 };
 
 exports.deleteJobExperience = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const { id } = req.params;
     const jobExperience = await JobExperience.findByPk(id);
 
     if (!jobExperience) {
@@ -72,14 +73,43 @@ exports.updateJobExperience = async (req, res) => {
       });
     }
 
-    jobExperience.title = title || jobExperience.title;
-    jobExperience.start_date = start_date || jobExperience.start_date;
-    jobExperience.end_date = end_date || jobExperience.end_date;
-    jobExperience.short_desc = short_desc || jobExperience.short_desc;
+    jobExperience.title = title;
+    jobExperience.start_date = start_date;
+    jobExperience.end_date = end_date !== "null" ? end_date : null;
+    jobExperience.short_desc = short_desc;
     jobExperience.thumbnail_path = newImgPath || jobExperience.thumbnail_path;
 
     await jobExperience.save();
     res.status(200).json(jobExperience);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.removeJobExperienceImage = async (req, res) => {
+  const { id } = req.params;
+  const { image_path } = req.body;
+
+  try {
+    const jobExperience = await JobExperience.findByPk(id);
+
+    if (!jobExperience) {
+      return res.status(404).send("JobExperience not found");
+    }
+
+    if (image_path === jobExperience.thumbnail_path) {
+      fs.unlink(jobExperience.thumbnail_path, (err) => {
+        if (err) {
+          return res.status(500).send("Failed to delete old image file");
+        }
+      });
+
+      jobExperience.thumbnail_path = null;
+      await jobExperience.save();
+      res.status(200).json(jobExperience);
+    } else {
+      return res.status(404).send("Image path does not match");
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

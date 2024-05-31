@@ -1,69 +1,57 @@
 <script setup lang="ts">
-import SkillComp from '@/components/contents/SkillComp.vue'
+import AdminExperienceComp from '@/components/contents/admin/AdminExperienceComp.vue'
+import AdminSkillComp from '@/components/contents/admin/AdminSkillComp.vue'
 import ExperienceForm from '@/components/forms/ExperienceForm.vue'
 import SkillForm from '@/components/forms/SkillForm.vue'
 import { type GetJobExperience, PutJobExperience } from '@/entities/experiences/JobExperience'
-import type { PutProjectExperience } from '@/entities/experiences/ProjectExperience'
+import {
+  type GetProjectExperience,
+  PutProjectExperience
+} from '@/entities/experiences/ProjectExperience'
 import {
   type GetTrainingExperience,
   PutTrainingExperience
 } from '@/entities/experiences/TrainingExperience'
 import { type GetHardSkill, PutHardSkill } from '@/entities/skills/HardSkill'
 import { PutSoftSkill, type GetSoftSkill } from '@/entities/skills/SoftSkill'
-import { ApiMethods } from '@/helpers/ApiMethods'
+import { ExperienceApi } from '@/helpers/api/ExperienceApi'
+import { SkillApi } from '@/helpers/api/SkillApi'
+import { JobExperienceMapper } from '@/helpers/mappers/experiences/JobExperienceMapper'
+import { ProjectExperienceMapper } from '@/helpers/mappers/experiences/ProjectExperienceMapper'
+import { TrainingExperienceMapper } from '@/helpers/mappers/experiences/TrainingExperienceMapper'
+import { HardSkillMapper } from '@/helpers/mappers/skills/HardSkillMapper'
+import { SoftSkillMapper } from '@/helpers/mappers/skills/SoftSkillMapper'
 import { onMounted, ref } from 'vue'
 
-const api = new ApiMethods()
-const backUrl = import.meta.env.VITE_BACKEND_URL
+const softSkillMapper = new SoftSkillMapper()
+const hardSkillMapper = new HardSkillMapper()
+const skillApi = new SkillApi()
 
 const softSkills = ref<Array<GetSoftSkill>>([])
 const hardSkills = ref<Array<GetHardSkill>>([])
 const editingSkill = ref<PutSoftSkill | PutHardSkill | undefined>(undefined)
 
-function getSkills() {
-  api
-    .getData('hard-skills')
-    .then(
-      (returnedValue) =>
-        (hardSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
-          a.name.localeCompare(b.name)
-        ))
-    )
-  api
-    .getData('soft-skills')
-    .then(
-      (returnedValue) =>
-        (softSkills.value = returnedValue.sort((a: GetHardSkill, b: GetHardSkill) =>
-          a.name.localeCompare(b.name)
-        ))
-    )
+async function getSkills() {
+  softSkills.value = await skillApi.getAllSoftSkills()
+  hardSkills.value = await skillApi.getAllHardSkills()
 }
 
+const projectMapper = new ProjectExperienceMapper()
+const jobMapper = new JobExperienceMapper()
+const trainingMapper = new TrainingExperienceMapper()
+const experienceApi = new ExperienceApi()
+
+const projectExperiences = ref<Array<GetProjectExperience>>([])
 const jobExperiences = ref<Array<GetJobExperience>>([])
 const trainingExperiences = ref<Array<GetTrainingExperience>>([])
 const editingExperience = ref<
   PutProjectExperience | PutJobExperience | PutTrainingExperience | undefined
 >(undefined)
 
-function getExperiences() {
-  api
-    .getData('job-experiences')
-    .then(
-      (returnedValue) =>
-        (jobExperiences.value = returnedValue.sort(
-          (a: GetJobExperience, b: GetJobExperience) =>
-            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-        ))
-    )
-  api
-    .getData('training-experiences')
-    .then(
-      (returnedValue) =>
-        (trainingExperiences.value = returnedValue.sort(
-          (a: GetTrainingExperience, b: GetTrainingExperience) =>
-            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-        ))
-    )
+async function getExperiences() {
+  projectExperiences.value = await experienceApi.getAllProjectExperiences()
+  jobExperiences.value = await experienceApi.getAllJobExperiences()
+  trainingExperiences.value = await experienceApi.getAllTrainingExperiences()
 }
 
 onMounted(() => {
@@ -79,110 +67,75 @@ onMounted(() => {
     <skill-form :skill="editingSkill" :getSkills="getSkills" class="mb3" />
     <h3 class="mb1">Soft Skill</h3>
     <p class="mb2 prl2 text-a-cent">Cliquer sur un élément des listes pour le modifier</p>
-    <div class="skill-list mb3">
-      <div
+    <div class="items-list mb3">
+      <admin-skill-comp
         v-for="(skill, index) in softSkills"
         :key="index"
+        :skill="skill"
         class="mb1"
-        @click="editingSkill = new PutSoftSkill(skill.id, skill.name, null, skill.svg_path)"
-      >
-        <p>{{ skill.id }}</p>
-        <skill-comp :skill="skill" color="grey" size="small" />
-      </div>
+        @click="editingSkill = softSkillMapper.getSoftSkillToPutSoftSkill(skill)"
+      />
     </div>
 
     <h3 class="mb1">Hard Skill</h3>
     <p class="mb2 prl2 text-a-cent">Cliquer sur un élément des listes pour le modifier</p>
-    <div class="skill-list mb3">
-      <div
+    <div class="items-list mb3">
+      <admin-skill-comp
         v-for="(skill, index) in hardSkills"
         :key="index"
+        :skill="skill"
         class="mb1"
-        @click="
-          editingSkill = new PutHardSkill(skill.id, skill.name, null, skill.svg_path, skill.mastery)
-        "
-      >
-        <p>{{ skill.id }}</p>
-        <skill-comp :skill="skill" color="grey" size="small" />
-        <p class="text-a-cent">{{ skill.mastery }}</p>
-      </div>
+        @click="editingSkill = hardSkillMapper.getHardSkillToPutHardSkill(skill)"
+      />
     </div>
   </section>
   <section class="f-col a-cent">
     <h2 class="mb2">Gestion des expériences</h2>
     <experience-form :experience="editingExperience" :getExperiences="getExperiences" class="mb3" />
     <h3 class="mb1">Projets</h3>
+    <div class="items-list mb3">
+      <admin-experience-comp
+        v-for="(project, index) in projectExperiences"
+        :key="index"
+        :experience="project"
+        class="mb1"
+        @click="
+          editingExperience = projectMapper.getProjectExperienceToPutProjectExperience(project)
+        "
+      />
+    </div>
     <h3 class="mb1">Emplois</h3>
-    <div class="skill-list mb3">
-      <div
+    <div class="items-list mb3">
+      <admin-experience-comp
         v-for="(job, index) in jobExperiences"
         :key="index"
+        :experience="job"
         class="mb1"
-        @click="
-          editingExperience = new PutJobExperience(
-            job.id,
-            job.title,
-            job.start_date,
-            job.end_date,
-            job.short_desc,
-            null,
-            job.thumbnail_path
-          )
-        "
-      >
-        <p>{{ job.id }}</p>
-        <p>{{ job.title }}</p>
-        <img
-          :src="backUrl + job.thumbnail_path"
-          :alt="'Image de ' + job.title"
-          style="width: 80px; height: auto"
-        />
-      </div>
+        @click="editingExperience = jobMapper.getJobExperienceToPutJobExperience(job)"
+      />
     </div>
     <h3 class="mb1">Formations</h3>
-    <div class="skill-list mb3">
-      <div
+    <div class="items-list mb3">
+      <admin-experience-comp
         v-for="(training, index) in trainingExperiences"
         :key="index"
+        :experience="training"
         class="mb1"
         @click="
-          editingExperience = new PutTrainingExperience(
-            training.id,
-            training.title,
-            training.start_date,
-            training.end_date,
-            training.short_desc,
-            null,
-            training.thumbnail_path
-          )
+          editingExperience = trainingMapper.getTrainingExperienceToPutTrainingExperience(training)
         "
-      >
-        <p>{{ training.id }}</p>
-        <p>{{ training.title }}</p>
-        <img
-          :src="backUrl + training.thumbnail_path"
-          :alt="'Image de ' + training.title"
-          style="width: 80px; height: auto"
-        />
-      </div>
+      />
     </div>
   </section>
 </template>
 
 <style scoped lang="scss">
-.skill-list {
+.items-list {
   display: grid;
   gap: 32px;
   grid-template-columns: repeat(10, 1fr);
   justify-items: center;
   width: 1200px;
-
-  p {
-    font-size: 10px;
-  }
-  div {
-    cursor: pointer;
-  }
 
   @media (max-width: 1300px) {
     grid-template-columns: repeat(8, 1fr);

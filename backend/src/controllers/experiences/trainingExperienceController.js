@@ -9,7 +9,7 @@ exports.createTrainingExperience = async (req, res) => {
     const trainingExperience = await TrainingExperience.create({
       title,
       start_date,
-      end_date,
+      end_date: end_date !== "null" ? end_date : null,
       short_desc,
       thumbnail_path,
     });
@@ -72,15 +72,44 @@ exports.updateTrainingExperience = async (req, res) => {
       });
     }
 
-    trainingExperience.title = title || trainingExperience.title;
-    trainingExperience.start_date = start_date || trainingExperience.start_date;
-    trainingExperience.end_date = end_date || trainingExperience.end_date;
-    trainingExperience.short_desc = short_desc || trainingExperience.short_desc;
+    trainingExperience.title = title;
+    trainingExperience.start_date = start_date;
+    trainingExperience.end_date = end_date !== "null" ? end_date : null;
+    trainingExperience.short_desc = short_desc;
     trainingExperience.thumbnail_path =
       newImgPath || trainingExperience.thumbnail_path;
 
     await trainingExperience.save();
     res.status(200).json(trainingExperience);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.removeTrainingExperienceImage = async (req, res) => {
+  const { id } = req.params;
+  const { image_path } = req.body;
+
+  try {
+    const trainingExperience = await TrainingExperience.findByPk(id);
+
+    if (!trainingExperience) {
+      return res.status(404).send("TrainingExperience not found");
+    }
+
+    if (image_path === trainingExperience.thumbnail_path) {
+      fs.unlink(trainingExperience.thumbnail_path, (err) => {
+        if (err) {
+          return res.status(500).send("Failed to delete old image file");
+        }
+      });
+
+      trainingExperience.thumbnail_path = null;
+      await trainingExperience.save();
+      res.status(200).json(trainingExperience);
+    } else {
+      return res.status(404).send("Image path does not match");
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

@@ -3,6 +3,7 @@ const cors = require("cors");
 const sequelize = require("./src/config/sequelize");
 const hardSkillRoutes = require("./src/routes/skills/hardSkillRoutes");
 const softSkillRoutes = require("./src/routes/skills/softSkillRoutes");
+const projectExperienceRoutes = require("./src/routes/experiences/projectExperienceRoutes");
 const jobExperienceRoutes = require("./src/routes/experiences/jobExperienceRoutes");
 const trainingExperienceRoutes = require("./src/routes/experiences/trainingExperienceRoutes");
 
@@ -16,6 +17,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/hard-skills", hardSkillRoutes);
 app.use("/soft-skills", softSkillRoutes);
 
+app.use("/project-experiences", projectExperienceRoutes);
 app.use("/job-experiences", jobExperienceRoutes);
 app.use("/training-experiences", trainingExperienceRoutes);
 

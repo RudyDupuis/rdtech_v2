@@ -64,7 +64,7 @@ exports.updateSoftSkill = async (req, res) => {
       });
     }
 
-    softSkill.name = name || softSkill.name;
+    softSkill.name = name;
     softSkill.svg_path = newSvgPath || softSkill.svg_path;
 
     await softSkill.save();

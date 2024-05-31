@@ -13,27 +13,6 @@
     xmlns="http://www.w3.org/2000/svg"
     xmlns:svg="http://www.w3.org/2000/svg"
   >
-    <defs id="defs72" />
-    <sodipodi:namedview
-      id="namedview70"
-      pagecolor="#ffffff"
-      bordercolor="#000000"
-      borderopacity="0.25"
-      inkscape:showpageshadow="2"
-      inkscape:pageopacity="0.0"
-      inkscape:pagecheckerboard="0"
-      inkscape:deskcolor="#d1d1d1"
-      showgrid="false"
-      inkscape:zoom="1.505618"
-      inkscape:cx="25.570895"
-      inkscape:cy="2.3246268"
-      inkscape:window-width="1920"
-      inkscape:window-height="991"
-      inkscape:window-x="-9"
-      inkscape:window-y="-9"
-      inkscape:window-maximized="1"
-      inkscape:current-layer="svg68"
-    />
     <path
       d="M 6.8282751,7.602287 14.237231,8.651833 12.67646,9.229729 8.9471691,9.052993 l -1.849472,3.244045 -2.971113,2.261334 0.667902,3.673251 -0.822479,3.641756 2.8727,2.383124 1.711083,3.31811 3.7335239,-0.02124 3.443923,1.441518 2.84709,-2.415989 3.565146,-1.109969 0.629175,-3.679615 2.01795,-3.14156 -1.883758,-3.222398 -0.472499,-3.703447 -3.515456,-1.257049 -1.289611,-1.190241 9.067055,1.663641 C 31.199294,17.662396 30.172234,25.52082 23.445591,30.023602 16.718868,34.526443 6.8404071,33.969219 2.3391261,27.244822 -2.1620729,20.520367 0.10169214,12.10515 6.8282751,7.602287 Z"
       fill="#7a7a7a"

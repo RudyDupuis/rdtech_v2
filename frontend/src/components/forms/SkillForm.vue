@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { PostHardSkill, PutHardSkill } from '@/entities/skills/HardSkill'
 import { PostSoftSkill, PutSoftSkill } from '@/entities/skills/SoftSkill'
-import { ApiMethods } from '@/helpers/ApiMethods'
+import { ApiMethods } from '@/helpers/api/ApiMethods'
+import { HardSkillMapper } from '@/helpers/mappers/skills/HardSkillMapper'
+import { SoftSkillMapper } from '@/helpers/mappers/skills/SoftSkillMapper'
 import { computed, ref, watch } from 'vue'
 
 interface Props {
@@ -10,12 +12,14 @@ interface Props {
 }
 const props = defineProps<Props>()
 const api = new ApiMethods()
+const hardSkillMapper = new HardSkillMapper()
+const softSkillMapper = new SoftSkillMapper()
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const selectedtype = ref<'softSkill' | 'hardSkill'>('hardSkill')
 const editingSkill = ref<PostSoftSkill | PostHardSkill | PutSoftSkill | PutHardSkill>(
-  new PostHardSkill('', null, 'beginner')
+  hardSkillMapper.emptyPostHardSkill()
 )
 const imageUrl = computed<string>(() => {
   return isPutSkill(editingSkill.value)
@@ -47,8 +51,16 @@ function isSoftSkill(skill: typeof editingSkill.value): skill is PostSoftSkill |
 }
 
 function resetForm() {
-  editingSkill.value = new PostHardSkill('', null, 'beginner')
-  selectedtype.value = 'hardSkill'
+  switch (selectedtype.value) {
+    case 'softSkill':
+      editingSkill.value = softSkillMapper.emptyPostSoftSkill()
+      break
+    case 'hardSkill':
+      editingSkill.value = hardSkillMapper.emptyPostHardSkill()
+      break
+    default:
+      editingSkill.value = hardSkillMapper.emptyPostHardSkill()
+  }
   if (fileInput.value) {
     fileInput.value.value = ''
   }
@@ -93,8 +105,8 @@ async function handleDelete() {
 watch(selectedtype, () => {
   editingSkill.value =
     selectedtype.value === 'softSkill'
-      ? new PostSoftSkill('', null)
-      : new PostHardSkill('', null, 'beginner')
+      ? softSkillMapper.emptyPostSoftSkill()
+      : hardSkillMapper.emptyPostHardSkill()
 })
 watch(
   () => props.skill,
@@ -112,7 +124,8 @@ watch(
       {{ (isPostSkill(editingSkill) ? 'Créer' : 'Modifier ') + ' une compétence' }}
     </h3>
 
-    <select v-if="isPostSkill(editingSkill)" v-model="selectedtype" placeholder="Type">
+    <label for="type" class="text-a-cent">Type</label>
+    <select id="type" v-if="isPostSkill(editingSkill)" v-model="selectedtype">
       <option value="softSkill">Soft Skill</option>
       <option value="hardSkill">Hard Skill</option>
     </select>
@@ -120,7 +133,7 @@ watch(
     <img v-if="isPutSkill(editingSkill)" :src="imageUrl" :alt="'Logo de ' + editingSkill.name" />
 
     <form @submit.prevent="handleSubmit" enctype="multipart/form-data" class="mb1">
-      <input v-model="editingSkill.name" type="text" placeholder="Nom" required />
+      <input v-model="editingSkill.name" type="text" placeholder="Nom *" required />
 
       <select
         v-if="isHardSkill(editingSkill)"
@@ -133,7 +146,7 @@ watch(
         <option value="beginner">Débutant</option>
       </select>
 
-      <label for="svg" class="text-a-cent">SVG - 80px par 80px</label>
+      <label for="svg" class="text-a-cent">SVG - 80px par 80px *</label>
       <input
         ref="fileInput"
         type="file"
