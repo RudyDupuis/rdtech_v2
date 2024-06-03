@@ -215,3 +215,18 @@ exports.getAllFavoriteProjectExperiences = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.getProjectExperienceById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const projectExperience = await ProjectExperience.findByPk(id, {
+      include: {
+        model: HardSkill,
+        as: "hard_skills",
+      },
+    });
+    res.status(200).json(projectExperience);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

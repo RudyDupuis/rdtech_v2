@@ -30,5 +30,6 @@ router.get(
   "/favorites",
   projectExperienceController.getAllFavoriteProjectExperiences
 );
+router.get("/:id", projectExperienceController.getProjectExperienceById);
 
 module.exports = router;

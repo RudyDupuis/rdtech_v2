@@ -81,7 +81,7 @@ onMounted(async () => {
           Contactez moi pour discuter de vos besoins en développement web et UX design. Ensemble,
           nous réaliserons votre projet numérique.
         </p>
-        <router-link to="" class="button">Me contacter</router-link>
+        <router-link :to="{ name: 'contact' }" class="button">Me contacter</router-link>
       </div>
     </section>
 

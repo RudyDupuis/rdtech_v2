@@ -53,6 +53,17 @@ export class ExperienceApi {
     }
   }
 
+  async getProjectExperienceById(id: string): Promise<GetProjectExperience> {
+    try {
+      const rawProjectExperience = await this.api.getData('project-experiences/' + id)
+      const projectExperience = this.projectMapper.jsonToGetProjectExperience(rawProjectExperience)
+
+      return projectExperience
+    } catch (error) {
+      throw new Error(`Error fetching project experience with id ${id}: ${error}`)
+    }
+  }
+
   async getAllJobExperiences(): Promise<Array<GetJobExperience>> {
     try {
       const rawJobExperiences = await this.api.getData('job-experiences')

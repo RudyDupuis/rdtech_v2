@@ -18,6 +18,14 @@ $grey-3: #e0e0e0;
   color: $false;
 }
 
+.text-succes {
+  color: $true;
+}
+
+.text-important {
+  color: $dark-primary;
+}
+
 /** Background **/
 .bg-primary {
   background: $dark-primary;
@@ -48,9 +56,6 @@ $grey-3: #e0e0e0;
 }
 
 /** Border **/
-.clickable-box {
+.primary-border {
   border: 3px solid $primary;
-  &:hover {
-    border: 4px solid $secondary;
-  }
 }

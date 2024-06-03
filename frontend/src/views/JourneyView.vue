@@ -8,7 +8,7 @@ import { GetTrainingExperience } from '@/entities/experiences/TrainingExperience
 import { GetHardSkill } from '@/entities/skills/HardSkill'
 import { ExperienceApi } from '@/helpers/api/ExperienceApi'
 import { SkillApi } from '@/helpers/api/SkillApi'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const skillApi = new SkillApi()
 const experienceApi = new ExperienceApi()
@@ -60,6 +60,15 @@ function toggleProjectFilterBySkill(filter: GetHardSkill['id']) {
   }
 }
 
+const showScrollToTopButton = ref<boolean>(false)
+function handleScrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function handleShowScrollToTopButton() {
+  showScrollToTopButton.value = window.scrollY > window.innerHeight * 0.5 ? true : false
+}
+
 onMounted(async () => {
   hardSkills.value = await skillApi.getAllHardSkills()
 
@@ -71,6 +80,12 @@ onMounted(async () => {
       return b.start_date.getTime() - a.start_date.getTime()
     }
   )
+
+  window.addEventListener('scroll', handleShowScrollToTopButton)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleShowScrollToTopButton)
 })
 </script>
 
@@ -126,6 +141,14 @@ onMounted(async () => {
         />
       </div>
     </section>
+
+    <button
+      v-show="showScrollToTopButton"
+      class="scroll-to-top-button"
+      @click="handleScrollToTop()"
+    >
+      ↑
+    </button>
 
     <section id="parcours" class="f-col a-cent ptb3">
       <div v-for="(experience, index) in filteredExperiences" :key="index" class="f-col a-cent">
