@@ -1,2 +1,4 @@
 /uploads/experiences/*
 /uploads/skills/*
+/node_modules
+.env.local

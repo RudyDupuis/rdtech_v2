@@ -2,6 +2,7 @@ const express = require("express");
 const { experienceUpload } = require("../../middleswares/uploadMiddleware");
 const projectExperienceController = require("../../controllers/experiences/projectExperienceController");
 const router = express.Router();
+const { authenticateToken } = require("../../middleswares/authMiddleware");
 
 router.post(
   "/",
@@ -9,21 +10,28 @@ router.post(
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
   ]),
+  authenticateToken,
   projectExperienceController.createProjectExperience
 );
 router.get("/", projectExperienceController.getAllProjectExperiences);
-router.delete("/:id", projectExperienceController.deleteProjectExperience);
+router.delete(
+  "/:id",
+  authenticateToken,
+  projectExperienceController.deleteProjectExperience
+);
 router.put(
   "/:id",
   experienceUpload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "images", maxCount: 10 },
   ]),
+  authenticateToken,
   projectExperienceController.updateProjectExperience
 );
 router.post(
   "/remove-image/:id",
   experienceUpload.none(),
+  authenticateToken,
   projectExperienceController.removeProjectExperienceImage
 );
 router.get(

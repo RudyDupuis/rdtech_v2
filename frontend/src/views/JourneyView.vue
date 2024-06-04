@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ErrorMessageComp from '@/components/contents/ErrorMessageComp.vue'
 import ExperienceComp from '@/components/contents/ExperienceComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
 import { GetExperience } from '@/entities/experiences/Experience'
@@ -167,7 +168,8 @@ onUnmounted(() => {
         <div class="decorative-line bg-primary mb2"></div>
         <experience-comp :experience="experience" class="mb2" />
       </div>
-      <p v-if="filteredExperiences.length === 0">Aucun résultat ...</p>
+      <p v-if="filteredExperiences.length === 0 && experiences.length > 0">Aucun résultat ...</p>
+      <error-message-comp v-if="experiences.length === 0" class="mb4" />
     </section>
   </main>
 </template>

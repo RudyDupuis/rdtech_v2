@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ToolsboxAnimComp from '@/components/animations/ToolsboxAnimComp.vue'
+import ErrorMessageComp from '@/components/contents/ErrorMessageComp.vue'
 import ExperienceComp from '@/components/contents/ExperienceComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
 import { GetProjectExperience } from '@/entities/experiences/ProjectExperience'
@@ -121,6 +122,7 @@ onMounted(async () => {
             :color="skill.mastery === 'advanced' ? 'primary' : 'secondary'"
             size="medium"
           />
+          <error-message-comp v-if="filteredHardSkills.length === 0" />
         </div>
         <h3 class="mb3">Soft skills</h3>
         <div class="medium-skill-list">
@@ -131,19 +133,20 @@ onMounted(async () => {
             color="secondary"
             size="medium"
           />
+          <error-message-comp v-if="softSkills.length === 0" />
         </div>
       </div>
     </section>
 
     <section id="favorite-projects" class="f-col a-cent">
       <h2 class="mb3">Mes projets favoris</h2>
-      <div class="w100 f f-wrap j-even">
+      <div class="w100 f f-wrap j-even mb3">
         <experience-comp
           v-for="(project, index) in favoriteProjects"
           :key="index"
           :experience="project"
-          class="mb3"
         />
+        <error-message-comp v-if="favoriteProjects.length === 0" />
       </div>
       <router-link :to="{ name: 'myJourney' }" class="button mb4">Voir mon parcours</router-link>
     </section>

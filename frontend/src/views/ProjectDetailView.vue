@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SkillComp from '@/components/contents/SkillComp.vue'
+import ToolsboxFullSvg from '@/components/svgs/toolsbox/toolsboxFullSvg.vue'
 import { GetProjectExperience } from '@/entities/experiences/ProjectExperience'
 import { ExperienceApi } from '@/helpers/api/ExperienceApi'
 import { formatExperienceDate } from '@/helpers/formatting'
@@ -100,6 +101,14 @@ onMounted(async () => {
         Lire la documentation
       </a>
     </section>
+  </main>
+  <main v-else class="f-col a-cent">
+    <h1 class="mb4">Projet introuvable</h1>
+    <p class="larger-text text-a-cent mb1 prl2">Le projet n'a pas été trouvé ...</p>
+    <RouterLink :to="{ name: 'myJourney' }" class="button mb4"
+      >Revenir à la liste des projets ?</RouterLink
+    >
+    <ToolsboxFullSvg class="mb4" />
   </main>
 </template>
 

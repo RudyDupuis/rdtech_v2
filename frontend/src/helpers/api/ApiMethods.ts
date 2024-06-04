@@ -19,9 +19,13 @@ export class ApiMethods {
         formData.append(key, data[key])
       }
     }
+
+    const headers = new Headers()
+    headers.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`)
     const response = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers
     })
     return response.json()
   }
@@ -38,17 +42,25 @@ export class ApiMethods {
         formData.append(key, data[key])
       }
     }
+
+    const headers = new Headers()
+    headers.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`)
     const response = await fetch(url, {
       method: 'PUT',
-      body: formData
+      body: formData,
+      headers
     })
     return response.json()
   }
 
   async deleteData(endpoint: string) {
     const url = `${this.baseUrl}${endpoint}`
+
+    const headers = new Headers()
+    headers.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`)
     await fetch(url, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers
     })
   }
 }
