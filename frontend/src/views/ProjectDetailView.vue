@@ -12,6 +12,7 @@ const projectId = route.params.id.toString()
 const backUrl = import.meta.env.VITE_BACKEND_URL
 
 const experienceApi = new ExperienceApi()
+const experienceIsLoading = ref<boolean>(false)
 
 const project = ref<GetProjectExperience | undefined>(undefined)
 const carouselIndex = ref<number>(0)
@@ -25,7 +26,9 @@ function handleCarousel(direction: 'right' | 'left') {
 }
 
 onMounted(async () => {
+  experienceIsLoading.value = true
   project.value = await experienceApi.getProjectExperienceById(projectId)
+  experienceIsLoading.value = false
 
   const thumbnailUrl = project.value.thumbnail_path ? [backUrl + project.value.thumbnail_path] : []
   const imageUrls = project.value.images_path
@@ -102,17 +105,23 @@ onMounted(async () => {
       </a>
     </section>
   </main>
-  <main v-else class="f-col a-cent">
-    <h1 class="mb4">Projet introuvable</h1>
-    <p class="larger-text text-a-cent mb1 prl2">Le projet n'a pas été trouvé ...</p>
-    <RouterLink :to="{ name: 'myJourney' }" class="button mb4"
-      >Revenir à la liste des projets ?</RouterLink
-    >
-    <ToolsboxFullSvg class="mb4" />
+  <main v-else class="f-col a-cent j-cent">
+    <div v-if="experienceIsLoading" class="loader"></div>
+    <template v-else>
+      <h1 class="mb4">Projet introuvable</h1>
+      <p class="larger-text text-a-cent mb1 prl2">Le projet n'a pas été trouvé ...</p>
+      <RouterLink :to="{ name: 'myJourney' }" class="button mb4"
+        >Revenir à la liste des projets ?</RouterLink
+      >
+      <ToolsboxFullSvg class="mb4" />
+    </template>
   </main>
 </template>
 
 <style scoped lang="scss">
+main {
+  min-height: calc(100dvh - 96px);
+}
 img {
   width: 600px;
   height: auto;

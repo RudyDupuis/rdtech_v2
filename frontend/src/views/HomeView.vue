@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ToolsboxAnimComp from '@/components/animations/ToolsboxAnimComp.vue'
-import ErrorMessageComp from '@/components/contents/ErrorMessageComp.vue'
 import ExperienceComp from '@/components/contents/ExperienceComp.vue'
+import FetchDataComp from '@/components/contents/FetchDataComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
 import { GetProjectExperience } from '@/entities/experiences/ProjectExperience'
 import type { GetHardSkill } from '@/entities/skills/HardSkill'
@@ -14,8 +14,11 @@ import { computed, onMounted, ref } from 'vue'
 const isSmallScreen = useIsSmallScreen()
 
 const skillApi = new SkillApi()
+const softskillIsLoading = ref<boolean>(false)
+const hardskillIsLoading = ref<boolean>(false)
 
 const experienceApi = new ExperienceApi()
+const experienceIsLoading = ref<boolean>(false)
 const favoriteProjects = ref<Array<GetProjectExperience>>([])
 
 const softSkills = ref<Array<GetSoftSkill>>([])
@@ -33,9 +36,15 @@ function toggleFilter(filter: GetHardSkill['mastery']) {
 }
 
 onMounted(async () => {
+  experienceIsLoading.value = true
+  softskillIsLoading.value = true
+  hardskillIsLoading.value = true
   favoriteProjects.value = await experienceApi.getAllFavoriteProjectExperiences()
+  experienceIsLoading.value = false
   softSkills.value = await skillApi.getAllSoftSkills()
+  softskillIsLoading.value = false
   hardSkills.value = await skillApi.getAllHardSkills()
+  hardskillIsLoading.value = false
 })
 </script>
 
@@ -122,7 +131,10 @@ onMounted(async () => {
             :color="skill.mastery === 'advanced' ? 'primary' : 'secondary'"
             size="medium"
           />
-          <error-message-comp v-if="filteredHardSkills.length === 0" />
+          <fetch-data-comp
+            :isloading="hardskillIsLoading"
+            :has-data="filteredHardSkills.length !== 0"
+          />
         </div>
         <h3 class="mb3">Soft skills</h3>
         <div class="medium-skill-list">
@@ -133,7 +145,7 @@ onMounted(async () => {
             color="secondary"
             size="medium"
           />
-          <error-message-comp v-if="softSkills.length === 0" />
+          <fetch-data-comp :isloading="softskillIsLoading" :has-data="softSkills.length !== 0" />
         </div>
       </div>
     </section>
@@ -146,7 +158,10 @@ onMounted(async () => {
           :key="index"
           :experience="project"
         />
-        <error-message-comp v-if="favoriteProjects.length === 0" />
+        <fetch-data-comp
+          :isloading="experienceIsLoading"
+          :has-data="favoriteProjects.length !== 0"
+        />
       </div>
       <router-link :to="{ name: 'myJourney' }" class="button mb4">Voir mon parcours</router-link>
     </section>

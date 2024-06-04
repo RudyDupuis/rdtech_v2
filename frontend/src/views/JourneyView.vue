@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ErrorMessageComp from '@/components/contents/ErrorMessageComp.vue'
 import ExperienceComp from '@/components/contents/ExperienceComp.vue'
 import SkillComp from '@/components/contents/SkillComp.vue'
 import { GetExperience } from '@/entities/experiences/Experience'
@@ -10,9 +9,11 @@ import { GetHardSkill } from '@/entities/skills/HardSkill'
 import { ExperienceApi } from '@/helpers/api/ExperienceApi'
 import { SkillApi } from '@/helpers/api/SkillApi'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import FetchDataComp from '@/components/contents/FetchDataComp.vue'
 
 const skillApi = new SkillApi()
 const experienceApi = new ExperienceApi()
+const experienceIsLoading = ref<boolean>(false)
 
 const hardSkills = ref<Array<GetHardSkill>>([])
 
@@ -73,6 +74,7 @@ function handleShowScrollToTopButton() {
 onMounted(async () => {
   hardSkills.value = await skillApi.getAllHardSkills()
 
+  experienceIsLoading.value = true
   const projectExperiences = await experienceApi.getAllProjectExperiences()
   const jobExperiences = await experienceApi.getAllJobExperiences()
   const trainingExperiences = await experienceApi.getAllTrainingExperiences()
@@ -81,6 +83,7 @@ onMounted(async () => {
       return b.start_date.getTime() - a.start_date.getTime()
     }
   )
+  experienceIsLoading.value = false
 
   window.addEventListener('scroll', handleShowScrollToTopButton)
 })
@@ -151,7 +154,7 @@ onUnmounted(() => {
       ↑
     </button>
 
-    <section id="parcours" class="f-col a-cent ptb3">
+    <section id="parcours" class="f-col a-cent ptb3 mb4">
       <div v-for="(experience, index) in filteredExperiences" :key="index" class="f-col a-cent">
         <template
           v-if="
@@ -169,7 +172,7 @@ onUnmounted(() => {
         <experience-comp :experience="experience" class="mb2" />
       </div>
       <p v-if="filteredExperiences.length === 0 && experiences.length > 0">Aucun résultat ...</p>
-      <error-message-comp v-if="experiences.length === 0" class="mb4" />
+      <fetch-data-comp :isloading="experienceIsLoading" :has-data="experiences.length !== 0" />
     </section>
   </main>
 </template>
