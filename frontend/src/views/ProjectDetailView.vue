@@ -27,14 +27,20 @@ function handleCarousel(direction: 'right' | 'left') {
 
 onMounted(async () => {
   experienceIsLoading.value = true
-  project.value = await experienceApi.getProjectExperienceById(projectId)
-  experienceIsLoading.value = false
-
-  const thumbnailUrl = project.value.thumbnail_path ? [backUrl + project.value.thumbnail_path] : []
-  const imageUrls = project.value.images_path
-    ? project.value.images_path.map((path) => backUrl + path)
-    : []
-  carouselUrls.value = [...thumbnailUrl, ...imageUrls]
+  try {
+    project.value = await experienceApi.getProjectExperienceById(projectId)
+    const thumbnailUrl = project.value.thumbnail_path
+      ? [backUrl + project.value.thumbnail_path]
+      : []
+    const imageUrls = project.value.images_path
+      ? project.value.images_path.map((path) => backUrl + path)
+      : []
+    carouselUrls.value = [...thumbnailUrl, ...imageUrls]
+  } catch (e) {
+    console.error(e)
+  } finally {
+    experienceIsLoading.value = false
+  }
 })
 </script>
 
@@ -105,8 +111,10 @@ onMounted(async () => {
       </a>
     </section>
   </main>
-  <main v-else class="f-col a-cent j-cent">
-    <div v-if="experienceIsLoading" class="loader"></div>
+  <main v-else class="f-col a-cent">
+    <section v-if="experienceIsLoading" class="loader-container f-col a-cent j-cent">
+      <div class="loader"></div>
+    </section>
     <template v-else>
       <h1 class="mb4">Projet introuvable</h1>
       <p class="larger-text text-a-cent mb1 prl2">Le projet n'a pas été trouvé ...</p>
@@ -119,8 +127,8 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-main {
-  min-height: calc(100dvh - 96px);
+.loader-container {
+  height: calc(100dvh - 96px);
 }
 img {
   width: 600px;

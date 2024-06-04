@@ -2,6 +2,12 @@
 import { ApiMethods } from '@/helpers/api/ApiMethods'
 import { ref } from 'vue'
 
+interface Props {
+  addToken(): void
+}
+
+const props = defineProps<Props>()
+
 const api = new ApiMethods()
 
 const loginInfo = ref({
@@ -20,6 +26,7 @@ async function handleSubmit() {
 
     if (response.token) {
       localStorage.setItem('authToken', response.token)
+      props.addToken()
     }
   } catch (error) {
     errorMessage.value = 'Une erreur inattendue est apparue.'

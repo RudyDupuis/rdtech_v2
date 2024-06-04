@@ -39,12 +39,27 @@ onMounted(async () => {
   experienceIsLoading.value = true
   softskillIsLoading.value = true
   hardskillIsLoading.value = true
-  favoriteProjects.value = await experienceApi.getAllFavoriteProjectExperiences()
-  experienceIsLoading.value = false
-  softSkills.value = await skillApi.getAllSoftSkills()
-  softskillIsLoading.value = false
-  hardSkills.value = await skillApi.getAllHardSkills()
-  hardskillIsLoading.value = false
+  try {
+    favoriteProjects.value = await experienceApi.getAllFavoriteProjectExperiences()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    experienceIsLoading.value = false
+  }
+  try {
+    softSkills.value = await skillApi.getAllSoftSkills()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    softskillIsLoading.value = false
+  }
+  try {
+    hardSkills.value = await skillApi.getAllHardSkills()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    hardskillIsLoading.value = false
+  }
 })
 </script>
 

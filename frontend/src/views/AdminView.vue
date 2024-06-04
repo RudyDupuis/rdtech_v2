@@ -62,6 +62,10 @@ function removeToken() {
   hasToken.value = false
 }
 
+function addToken() {
+  hasToken.value = true
+}
+
 onMounted(() => {
   getSkills()
   getExperiences()
@@ -70,7 +74,7 @@ onMounted(() => {
 
 <template>
   <h1 class="mb3">Administration</h1>
-  <login-form v-if="!hasToken" />
+  <login-form v-if="!hasToken" :add-token="addToken" />
   <template v-else>
     <section class="f-col a-cent">
       <button @click="removeToken()" class="mb3">Supprimer le token</button>

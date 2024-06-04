@@ -12,6 +12,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import FetchDataComp from '@/components/contents/FetchDataComp.vue'
 
 const skillApi = new SkillApi()
+const skillIsLoading = ref<boolean>(false)
+
 const experienceApi = new ExperienceApi()
 const experienceIsLoading = ref<boolean>(false)
 
@@ -72,18 +74,29 @@ function handleShowScrollToTopButton() {
 }
 
 onMounted(async () => {
-  hardSkills.value = await skillApi.getAllHardSkills()
-
+  skillIsLoading.value = true
   experienceIsLoading.value = true
-  const projectExperiences = await experienceApi.getAllProjectExperiences()
-  const jobExperiences = await experienceApi.getAllJobExperiences()
-  const trainingExperiences = await experienceApi.getAllTrainingExperiences()
-  experiences.value = [...projectExperiences, ...jobExperiences, ...trainingExperiences].sort(
-    (a, b) => {
-      return b.start_date.getTime() - a.start_date.getTime()
-    }
-  )
-  experienceIsLoading.value = false
+  try {
+    hardSkills.value = await skillApi.getAllHardSkills()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    skillIsLoading.value = false
+  }
+  try {
+    const projectExperiences = await experienceApi.getAllProjectExperiences()
+    const jobExperiences = await experienceApi.getAllJobExperiences()
+    const trainingExperiences = await experienceApi.getAllTrainingExperiences()
+    experiences.value = [...projectExperiences, ...jobExperiences, ...trainingExperiences].sort(
+      (a, b) => {
+        return b.start_date.getTime() - a.start_date.getTime()
+      }
+    )
+  } catch (e) {
+    console.error(e)
+  } finally {
+    experienceIsLoading.value = false
+  }
 
   window.addEventListener('scroll', handleShowScrollToTopButton)
 })
@@ -143,6 +156,7 @@ onUnmounted(() => {
           size="small"
           @click="toggleProjectFilterBySkill(skill.id)"
         />
+        <fetch-data-comp :isloading="skillIsLoading" :has-data="hardSkills.length !== 0" />
       </div>
     </section>
 

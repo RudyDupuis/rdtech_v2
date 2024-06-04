@@ -31,7 +31,6 @@ onMounted(() => {
 
 <template>
   <div class="f-col a-cent">
-    <!-- TODO à sécuriser -->
     <div v-html="svgContent" :class="`skill-size-${props.size} skill-color-${props.color}`"></div>
     <p class="text-a-cent" :style="`font-size: ${size == 'small' ? 10 : 12}px;`">
       {{ skill.name }}
