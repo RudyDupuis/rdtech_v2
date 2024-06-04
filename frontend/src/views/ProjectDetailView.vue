@@ -72,7 +72,7 @@ onMounted(async () => {
       <pre class="long-desc prl2">{{ project.long_desc }}</pre>
       <div>
         <h3 class="mb2">Technologie utilisées :</h3>
-        <div class="skill-list prl2">
+        <div class="small-skill-list prl2">
           <SkillComp
             v-for="hardSkill in project.hard_skills"
             :key="hardSkill.id"
@@ -117,30 +117,24 @@ img {
   @media (max-width: 520px) {
     width: 300px;
   }
-}
-.skill-list {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(7, 1fr);
-  justify-items: center;
-
-  @media (max-width: 1300px) {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  @media (max-width: 1050px) {
-    grid-template-columns: repeat(10, 1fr);
-  }
-  @media (max-width: 750px) {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  @media (max-width: 500px) {
-    grid-template-columns: repeat(5, 1fr);
+  @media (max-width: 400px) {
+    width: 280px;
   }
 }
 .long-desc {
   max-width: 600px;
   white-space: pre-wrap;
   text-align: justify;
+}
+.small-skill-list {
+  width: 600px;
+  @media (max-width: 1300px) {
+    width: 500px;
+  }
+}
+.carousel {
+  max-width: 100vw;
+  overflow: hidden;
 }
 
 @media (max-width: 1050px) {
@@ -153,6 +147,10 @@ img {
     .long-desc {
       margin-bottom: 64px;
       max-width: 100%;
+    }
+
+    .small-skill-list {
+      width: 80vw;
     }
 
     flex-direction: column;

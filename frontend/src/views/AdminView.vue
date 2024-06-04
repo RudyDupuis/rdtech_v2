@@ -67,7 +67,7 @@ onMounted(() => {
     <skill-form :skill="editingSkill" :getSkills="getSkills" class="mb3" />
     <h3 class="mb1">Soft Skill</h3>
     <p class="mb2 prl2 text-a-cent">Cliquer sur un élément des listes pour le modifier</p>
-    <div class="items-list mb3">
+    <div class="medium-skill-list w80vw mb3">
       <admin-skill-comp
         v-for="(skill, index) in softSkills"
         :key="index"
@@ -79,7 +79,7 @@ onMounted(() => {
 
     <h3 class="mb1">Hard Skill</h3>
     <p class="mb2 prl2 text-a-cent">Cliquer sur un élément des listes pour le modifier</p>
-    <div class="items-list mb3">
+    <div class="medium-skill-list w80vw mb3">
       <admin-skill-comp
         v-for="(skill, index) in hardSkills"
         :key="index"
@@ -93,7 +93,7 @@ onMounted(() => {
     <h2 class="mb2">Gestion des expériences</h2>
     <experience-form :experience="editingExperience" :getExperiences="getExperiences" class="mb3" />
     <h3 class="mb1">Projets</h3>
-    <div class="items-list mb3">
+    <div class="medium-skill-list w80vw mb3">
       <admin-experience-comp
         v-for="(project, index) in projectExperiences"
         :key="index"
@@ -105,7 +105,7 @@ onMounted(() => {
       />
     </div>
     <h3 class="mb1">Emplois</h3>
-    <div class="items-list mb3">
+    <div class="medium-skill-list w80vw mb3">
       <admin-experience-comp
         v-for="(job, index) in jobExperiences"
         :key="index"
@@ -115,7 +115,7 @@ onMounted(() => {
       />
     </div>
     <h3 class="mb1">Formations</h3>
-    <div class="items-list mb3">
+    <div class="medium-skill-list w80vw mb3">
       <admin-experience-comp
         v-for="(training, index) in trainingExperiences"
         :key="index"
@@ -128,30 +128,3 @@ onMounted(() => {
     </div>
   </section>
 </template>
-
-<style scoped lang="scss">
-.items-list {
-  display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(10, 1fr);
-  justify-items: center;
-  width: 1200px;
-
-  @media (max-width: 1300px) {
-    grid-template-columns: repeat(8, 1fr);
-    width: 900px;
-  }
-  @media (max-width: 1000px) {
-    grid-template-columns: repeat(6, 1fr);
-    width: 600px;
-  }
-  @media (max-width: 700px) {
-    grid-template-columns: repeat(4, 1fr);
-    width: 400px;
-  }
-  @media (max-width: 500px) {
-    grid-template-columns: repeat(3, 1fr);
-    width: 300px;
-  }
-}
-</style>

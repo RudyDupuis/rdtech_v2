@@ -90,3 +90,19 @@ button {
     font-size: 20px;
   }
 }
+
+.button-list {
+  @media (max-width: 800px) {
+    flex-direction: column;
+    button {
+      margin-left: 0;
+      margin-bottom: 16px;
+      width: 300px;
+    }
+  }
+  @media (max-width: 400px) {
+    button {
+      width: 80vw;
+    }
+  }
+}

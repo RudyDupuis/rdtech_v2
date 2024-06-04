@@ -100,7 +100,7 @@ onUnmounted(() => {
 
     <section class="f-col a-cent bg-grey-3 ptb2">
       <h2 class="mb2">Trier</h2>
-      <div class="button-list f a-cent mb2">
+      <div class="button-list w80vw f a-cent j-even mb2">
         <button
           class="choice-button"
           :class="{
@@ -130,7 +130,7 @@ onUnmounted(() => {
         </button>
       </div>
       <h2 class="mb2">Projet utilisant</h2>
-      <div class="skill-buttons-list">
+      <div class="small-skill-list w80vw">
         <skill-comp
           v-for="(skill, index) in hardSkills"
           :key="index"
@@ -208,41 +208,7 @@ onUnmounted(() => {
   }
 }
 
-.button-list {
-  @media (max-width: 800px) {
-    flex-direction: column;
-    button {
-      margin-left: 0;
-      margin-bottom: 16px;
-      width: 300px;
-    }
-  }
-  @media (max-width: 400px) {
-    button {
-      width: 80vw;
-    }
-  }
-}
-
-.skill-buttons-list {
-  display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(14, 1fr);
-  justify-items: center;
-
-  @media (max-width: 1500px) {
-    grid-template-columns: repeat(10, 1fr);
-  }
-  @media (max-width: 1100px) {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  @media (max-width: 800px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  @media (max-width: 400px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
+.small-skill-list {
   div {
     cursor: pointer;
 

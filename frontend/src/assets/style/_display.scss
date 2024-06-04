@@ -72,3 +72,22 @@
 .w100 {
   width: 100%;
 }
+.w80vw {
+  width: 80vw;
+  max-width: 1300px;
+}
+
+/*** grid ***/
+.small-skill-list {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  justify-items: center;
+}
+
+.medium-skill-list {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  justify-items: center;
+}

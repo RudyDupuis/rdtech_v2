@@ -89,7 +89,7 @@ onMounted(async () => {
       <h2 class="mb3">Mes compétences</h2>
       <div class="prl2">
         <h3 class="mb2">Hard skills</h3>
-        <div class="button-list f a-cent j-betw mb2">
+        <div class="button-list w80vw f a-cent j-even mb3">
           <button
             class="choice-button"
             :class="{ 'choice-button--active': hardSkillsFilter === 'advanced' }"
@@ -113,7 +113,7 @@ onMounted(async () => {
           </button>
         </div>
 
-        <div class="skill-list mb3">
+        <div class="medium-skill-list mb3">
           <skill-comp
             v-for="(skill, index) in filteredHardSkills"
             :key="index"
@@ -123,7 +123,7 @@ onMounted(async () => {
           />
         </div>
         <h3 class="mb3">Soft skills</h3>
-        <div class="skill-list">
+        <div class="medium-skill-list">
           <skill-comp
             v-for="(skill, index) in softSkills"
             :key="index"
@@ -188,42 +188,6 @@ onMounted(async () => {
 #skills {
   h3 {
     text-align: left;
-  }
-
-  .skill-list {
-    display: grid;
-    gap: 32px;
-    grid-template-columns: repeat(7, 1fr);
-    justify-items: center;
-
-    @media (max-width: 1000px) {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    @media (max-width: 800px) {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    @media (max-width: 600px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media (max-width: 400px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .button-list {
-    @media (max-width: 800px) {
-      flex-direction: column;
-      button {
-        margin-left: 0;
-        margin-bottom: 16px;
-        width: 300px;
-      }
-    }
-    @media (max-width: 400px) {
-      button {
-        width: 80vw;
-      }
-    }
   }
 }
 </style>
