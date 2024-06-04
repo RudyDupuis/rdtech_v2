@@ -1,4 +1,6 @@
 /uploads/experiences/*
 /uploads/skills/*
+!/uploads/experiences/*.gitignore
+!/uploads/skills/*.gitignore
 /node_modules
 .env.local
