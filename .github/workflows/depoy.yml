@@ -34,5 +34,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd /var/www/rdtech_v2
+            git pull
             docker-compose pull
             docker-compose up -d
