@@ -33,6 +33,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /var/www
+            cd /var/www/rdtech_v2
             docker-compose pull
             docker-compose up -d
