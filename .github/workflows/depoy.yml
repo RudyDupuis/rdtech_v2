@@ -20,11 +20,18 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /var/www/rdtech_v2 || { echo "Directory not found"; exit 1; }
-            git pull || { echo "Git pull failed"; exit 1; }
-            docker-compose stop || { echo "Failed to stop docker services"; exit 1; }
-            docker-compose up -d --build | { echo "Failed to build and start docker services"; exit 1; }
-            docker system prune -f || { echo "Failed to clean up"; exit 1; }
+            cd /var/www/rdtech_v2
+            git pull
+            docker-compose up -d --build
+
+      - name: Clean up old images
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker image prune -f
 
       - name: Verify services are running
         uses: appleboy/ssh-action@v0.1.5
