@@ -39,7 +39,10 @@ const router = createRouter({
       name: '404',
       component: Error404
     }
-  ]
+  ],
+  scrollBehavior() {
+    return { top: 0 }
+  }
 })
 
 export default router
