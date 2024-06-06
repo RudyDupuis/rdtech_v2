@@ -7,17 +7,16 @@ const projectExperienceRoutes = require("./src/routes/experiences/projectExperie
 const jobExperienceRoutes = require("./src/routes/experiences/jobExperienceRoutes");
 const trainingExperienceRoutes = require("./src/routes/experiences/trainingExperienceRoutes");
 const authRoutes = require("./src/routes/authRoutes");
+const env = require("./src/config/envLoader");
 
 const app = express();
 const PORT = 3000;
 
-// const corsOptions = {
-//   origin: 'https://rd-tech.fr',
-//   optionsSuccessStatus: 200
-// };
+const corsOptions = {
+  origin: env.FRONTEND_URL,
+};
 
-// app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
