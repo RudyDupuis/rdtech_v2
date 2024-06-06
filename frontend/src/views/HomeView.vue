@@ -99,12 +99,12 @@ onMounted(async () => {
           <br />
           Je suis <strong>développeur Web</strong> avec une appétence pour l&apos;
           <strong>UX design</strong>, impliqué dans toutes les étapes du processus, de la
-          <strong>recherche utilisateur</strong> à la
-          <strong>conception graphique</strong> jusqu&apos;au <strong>développement</strong>.
+          <strong>conception graphique</strong>, au <strong>développement</strong>, jusqu&apos;au
+          <strong>déploiement</strong>.
           <br />
           <br />
-          Contactez moi pour discuter de vos besoins en développement web et UX design. Ensemble,
-          nous réaliserons votre projet numérique.
+          Contactez moi pour discuter de vos besoins en développement web. Ensemble, nous
+          réaliserons votre projet numérique.
         </p>
         <router-link :to="{ name: 'contact' }" class="button">Me contacter</router-link>
       </div>
