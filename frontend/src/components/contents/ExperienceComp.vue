@@ -13,7 +13,7 @@ const backUrl = import.meta.env.VITE_BACKEND_URL
 </script>
 
 <template>
-  <div class="f-col a-cent">
+  <div class="f-col a-cent prl2">
     <img
       v-if="experience.thumbnail_path"
       :src="backUrl + experience.thumbnail_path"
@@ -42,6 +42,13 @@ div {
 img {
   width: 350px;
   height: auto;
+
+  @media (max-width: 520px) {
+    width: 300px;
+  }
+  @media (max-width: 400px) {
+    width: 280px;
+  }
 }
 p {
   text-align: center;

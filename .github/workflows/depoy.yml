@@ -40,4 +40,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            docker ps || { echo "Failed to list running containers"; exit 1; }
+            docker ps

@@ -17,11 +17,11 @@ const copyEmail = () => {
 
 <template>
   <main class="f-col a-cent j-cent">
-    <h1 class="mb4">Me Contacter</h1>
+    <h1 class="mb3">Me Contacter</h1>
     <p class="larger-text text-a-cent mb1 prl2">Vous pouvez me contacter à cette adresse mail :</p>
     <a :href="'mailto:' + emailAddress" class="mb2">{{ emailAddress }}</a>
     <button @click="copyEmail" class="mb1">Copier l'adresse email</button>
-    <p class="mb4">
+    <p class="mb2">
       <strong class="text-succes">{{ showSuccesMessage ? 'Mail copié !' : '&nbsp;' }}</strong>
     </p>
     <ToolsboxFullSvg class="mb4" />

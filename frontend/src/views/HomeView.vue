@@ -167,11 +167,12 @@ onMounted(async () => {
 
     <section id="favorite-projects" class="f-col a-cent">
       <h2 class="mb3">Mes projets favoris</h2>
-      <div class="w100 f f-wrap j-even mb3">
+      <div class="w100 f f-wrap j-even">
         <experience-comp
           v-for="(project, index) in favoriteProjects"
           :key="index"
           :experience="project"
+          class="mb3"
         />
         <fetch-data-comp
           :isloading="experienceIsLoading"
