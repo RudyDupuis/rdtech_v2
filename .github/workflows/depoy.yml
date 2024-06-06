@@ -13,7 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: SSH and deploy
+      - name: Stop and remove containers and images
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker stop $(docker ps -aq --filter="name=rdtech_v2_frontend" --filter="name=rdtech_v2_backend")
+            docker rm $(docker ps -aq --filter="name=rdtech_v2_frontend" --filter="name=rdtech_v2_backend")
+            docker rmi rdtech_v2_frontend rdtech_v2_backend
+
+      - name: Git pull and create new containers and images
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -22,16 +33,7 @@ jobs:
           script: |
             cd /var/www/rdtech_v2
             git pull
-            docker-compose up -d --build
-
-      - name: Clean up old images
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            docker image prune -f
+            docker-compose up -d
 
       - name: Verify services are running
         uses: appleboy/ssh-action@v0.1.5
